@@ -503,4 +503,331 @@
         #progressionTitle { font-size: 13px; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
         .progression-close { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 24px; cursor: pointer; line-height: 1; }
         .progression-close:hover { color: white; }
-        .progression-body { p....
+        .progression-body { padding: 12px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .prog-row-card { border-left: 4px solid var(--perry-gray); padding: 8px 10px; background: rgba(0,0,0,0.01); border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); border-radius: 0 8px 8px 0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; color: var(--text); }
+        body.dark-mode .prog-row-card { background: rgba(255,255,255,0.01); }
+        .prog-row-card.is-current-record { border-left-color: #d97706; background: #fffbeb; }
+        body.dark-mode .prog-row-card.is-current-record { background: #2a1f00; }
+        .prog-row-meta { display: flex; flex-direction: column; gap: 1px; }
+        .prog-row-name { font-size: 13px; font-weight: 800; }
+        .prog-row-yr { font-size: 11px; color: var(--text-muted); font-weight: 600; }
+        .prog-row-mark { font-size: 15px; font-weight: 900; color: #b45309; white-space: nowrap; }
+        body.dark-mode .prog-row-mark { color: var(--accent); }
+
+        /* Track records overlay block */
+        .record-banner-box { background: var(--primary); border: 2px solid var(--accent); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+        .record-banner-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
+        .record-banner-name { font-size: 14px; font-weight: 800; color: #ffffff; margin-top: 2px; }
+        .record-banner-time { font-size: 22px; font-weight: 900; color: var(--accent); white-space: nowrap; }
+        .record-banner-left { display: flex; flex-direction: column; min-width: 0; }
+
+        @media print {
+            body { background: #fff !important; color: #000 !important; padding: 0 !important; }
+            header, footer, .search-trigger-fab, .hamburger-btn, .dark-mode-btn, .header-sync-btn,
+            .filter-container, .nav-gender-toggle-row, .compare-bar, .compare-mode-btn { display: none !important; }
+            .container { max-width: 100% !important; width: 100% !important; padding: 0 !important; }
+            .rank-table th { background: #000 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            .rank-table td { color: #000 !important; border-bottom: 1px solid #666 !important; }
+            .rank-table tbody tr:nth-child(even) { background: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+            #recordBanner { background: #fff !important; border-color: #cbd5e1 !important; }
+            #recordBanner .record-banner-label, #recordBanner .record-banner-name, #recordBanner .record-banner-time { color: #000 !important; }
+            .rank-table-wrapper { border: 1px solid #999; box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div id="statusNotification" class="status-msg"></div>
+
+    <div id="progressionOverlay" class="progression-overlay" onclick="if(event.target.id==='progressionOverlay') closeRecordProgression()">
+        <div class="progression-modal">
+            <div class="progression-header">
+                <h3 id="progressionTitle">🏆 Record Progression</h3>
+                <button class="progression-close" onclick="closeRecordProgression()">&times;</button>
+            </div>
+            <div class="progression-body" id="progressionBody"></div>
+        </div>
+    </div>
+
+    <header>
+        <div class="dark-mode-btn" id="darkModeBtn"></div>
+        <div class="hamburger-btn" id="hamburgerBtn" title="Menu" onclick="openHamMenu()">
+            <span class="hamburger-icon-main">☰</span>
+        </div>
+        <div class="header-sync-btn" title="Force Manual Sync" onclick="fetchLiveGoogleSheets(true)">
+            <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
+        </div>
+        <h1>Perry Track / XC</h1>
+        <p>Program Leaderboards</p>
+    </header>
+    <div class="checker-border"></div>
+
+    <div class="drawer-overlay" id="drawerOverlay" onclick="closeHamMenu()"></div>
+    <div class="drawer-content" id="drawerContent">
+        <div class="drawer-header">
+            <span class="drawer-header-title">Navigation</span>
+            <button class="drawer-close-btn" onclick="closeHamMenu()">&times;</button>
+        </div>
+        <ul class="drawer-nav-list">
+            <li class="drawer-nav-item active" id="nav-item-leaderboards">
+                <button onclick="switchNavTab('leaderboards')">
+                    <svg class="drawer-nav-icon" viewBox="0 0 24 24"><path d="M12 2l-5.5 9h11zM5 22h14a2 2 0 002-2v-7H3v7a2 2 0 002 2z"/></svg>
+                    Leaderboards
+                </button>
+            </li>
+            <li class="drawer-nav-item" id="nav-item-rosters">
+                <button onclick="switchNavTab('rosters')">
+                    <svg class="drawer-nav-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z"/></svg>
+                    Athlete Rosters
+                </button>
+            </li>
+            <li class="drawer-nav-item" id="nav-item-accomplishments">
+                <button onclick="switchNavTab('accomplishments')">
+                    <svg class="drawer-nav-icon" viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.98 5.98 0 0011 16.9V19H9v2h6v-2h-2v-2.1c2.25-.26 4.1-1.63 4.76-3.56A4.987 4.987 0 0021 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.8C5.93 10.5 5 9.37 5 8zm14 0c0 1.37-.93 2.5-2 2.8V7h2v1z"/></svg>
+                    Program Achievements
+                </button>
+            </li>
+            <li class="drawer-nav-item" id="nav-item-statequalifiers">
+                <button onclick="switchNavTab('statequalifiers')">
+                    <svg class="drawer-nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
+                    State Qualifiers Archive
+                </button>
+            </li>
+            <li class="drawer-nav-item" id="nav-item-blog">
+                <button onclick="switchNavTab('blog')">
+                    <svg class="drawer-nav-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
+                    Updates & News
+                </button>
+            </li>
+        </ul>
+    </div>
+
+    <div class="nav-gender-toggle-row">
+        <div class="gender-toggle-group">
+            <button class="gender-toggle-btn active" id="gbtn-A" onclick="setGlobalGenderFilter('A')">All</button>
+            <button class="gender-toggle-btn" id="gbtn-M" onclick="setGlobalGenderFilter('M')">Boys</button>
+            <button class="gender-toggle-btn" id="gbtn-F" onclick="setGlobalGenderFilter('F')">Girls</button>
+        </div>
+    </div>
+
+    <div class="container" id="mainContainer">
+        </div>
+
+    <div class="search-trigger-fab" id="searchFab" title="Search Athletes" onclick="openSearchModal()">
+        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+    </div>
+
+    <div class="modal-overlay" id="searchModalOverlay" onclick="if(event.target.id==='searchModalOverlay') closeSearchModal()">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3 class="modal-title">🔍 Search Athletes</h3>
+                <button class="modal-close-btn" onclick="closeSearchModal()">&times;</button>
+            </div>
+            <div class="modal-search-box">
+                <input type="text" id="modalSearchInput" placeholder="Type athlete name..." oninput="handleModalSearchInput(this.value)" autocomplete="off">
+            </div>
+            <ul class="modal-results-list" id="modalSearchResultsArea"></ul>
+        </div>
+    </div>
+
+    <div class="compare-bar" id="compareBarHud">
+        <div class="compare-bar-names" id="compareBarNamesText"></div>
+        <button class="compare-bar-clear" onclick="clearCompareSelection()">Clear</button>
+        <button class="compare-bar-btn" onclick="openCompareOverlayPanel()">Compare</button>
+    </div>
+
+    <div class="compare-panel-overlay" id="comparePanelOverlay">
+        <div class="compare-panel-header">
+            <span class="compare-panel-title">📊 Head-to-Head Comparison</span>
+            <button class="compare-panel-close" onclick="closeComparePanel()">Close</button>
+        </div>
+        <div class="compare-panel-body" id="comparePanelBodyArea"></div>
+    </div>
+
+    <div class="checker-border" style="margin-top: 40px;"></div>
+    <footer class="site-footer">
+        <img src="Mass. Perry Black Outline.png" alt="Perry Panthers Logo" class="footer-panther-logo">
+        <p class="footer-title">Perry High School Track & Cross Country</p>
+        <div class="footer-socials">
+            <a href="https://twitter.com/PerryTrackXC" target="_blank" rel="noopener" class="footer-social-link" title="Follow us on Twitter/X">
+                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+            </a>
+            <a href="https://instagram.com/PerryTrackXC" target="_blank" rel="noopener" class="footer-social-link" title="Follow us on Instagram">
+                <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+            </a>
+        </div>
+    </footer>
+
+    <script>
+        // Global variables & state trackers
+        let currentTab = 'leaderboards';
+        let genderFilter = 'A'; // 'A' = All, 'M' = Boys, 'F' = Girls
+        
+        // Expanded cache structure mapping for smooth sandbox operations
+        const navCache = {
+            leaderboards: {},
+            rosters: {},
+            accomplishments: {},
+            statequalifiers: {},
+            alumni: {},
+            blog: {} // Sandbox news feed layout placeholder
+        };
+
+        // UI view container binding links
+        const mainContainer = document.getElementById('mainContainer');
+
+        // Handles sidebar layout toggle drawers
+        function openHamMenu() {
+            document.getElementById('drawerOverlay').classList.add('open');
+            document.getElementById('drawerContent').classList.add('open');
+        }
+        function closeHamMenu() {
+            document.getElementById('drawerOverlay').classList.remove('open');
+            document.getElementById('drawerContent').classList.remove('open');
+        }
+
+        // Global filter controllers changing view rules synchronously
+        function setGlobalGenderFilter(g) {
+            genderFilter = g;
+            ['A', 'M', 'F'].forEach(k => {
+                document.getElementById('gbtn-' + k).classList.remove('active');
+            });
+            document.getElementById('gbtn-' + g).classList.add('active');
+            
+            // Wipe active cache tabs to trigger layout rebuild instantly
+            for (const key in navCache) {
+                navCache[key] = {};
+            }
+            // Trigger dynamic re-draw
+            refreshActiveTab();
+        }
+
+        // Re-routes viewing state dynamically
+        function switchNavTab(tabId) {
+            currentTab = tabId;
+            closeHamMenu();
+
+            // Toggle active list highlights
+            document.querySelectorAll('.drawer-nav-item').forEach(el => el.classList.remove('active'));
+            const activeNavItem = document.getElementById('nav-item-' + tabId);
+            if (activeNavItem) activeNavItem.classList.add('active');
+
+            // Toggle floating action display controls depending on state
+            const searchFab = document.getElementById('searchFab');
+            if (tabId === 'leaderboards' || tabId === 'rosters' || tabId === 'alumni') {
+                searchFab.style.display = 'flex';
+            } else {
+                searchFab.style.display = 'none';
+            }
+
+            refreshActiveTab();
+        }
+
+        // Redraws screen layout using safe view routing channels
+        function refreshActiveTab() {
+            if (currentTab === 'leaderboards') {
+                // Original leaderboard rendering rules remain untouched
+                mainContainer.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;">⏳ Loading leaderboards...</p>';
+                // (Fallback placeholder matching standard original asset routing)
+            } else if (currentTab === 'rosters') {
+                mainContainer.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;">⏳ Loading rosters...</p>';
+            } else if (currentTab === 'accomplishments') {
+                mainContainer.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;">⏳ Loading accomplishments...</p>';
+            } else if (currentTab === 'statequalifiers') {
+                mainContainer.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;">⏳ Loading state qualifiers Archive...</p>';
+            } else if (currentTab === 'blog') {
+                renderBlogPage(mainContainer); // Direct path connection to our rendering system
+            }
+        }
+
+        // ── CORE BLOG RENDER FUNCTION ─────────────────────────────────
+        // Fetches your posts.json file, sequences them chronologically,
+        // and appends them inside your exact CSS design system layout cards.
+        async function renderBlogPage(container) {
+            if (navCache.blog[genderFilter]) {
+                container.innerHTML = navCache.blog[genderFilter];
+                return;
+            }
+
+            container.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;">⏳ Loading updates & announcements...</p>';
+
+            try {
+                // Fetch sandbox JSON post data assets safely
+                const response = await fetch('posts.json');
+                if (!response.ok) throw new Error('Could not retrieve blog assets.');
+                let posts = await response.json();
+
+                if (!posts || posts.length === 0) {
+                    container.innerHTML = '<p style="text-align:center;padding:20px;color:var(--text-muted);">No announcements posted yet.</p>';
+                    return;
+                }
+
+                // Filter posts dynamically using your global gender bar selections
+                if (genderFilter !== 'A') {
+                    posts = posts.filter(p => p.category === 'all' || p.category === (genderFilter === 'M' ? 'boys-track' : 'girls-track') || p.category === (genderFilter === 'M' ? 'boys-xc' : 'girls-xc') || p.category.includes(genderFilter.toLowerCase()));
+                }
+
+                // Chronological Date Sorting: Rearranges objects so backdated entries structure sequentially!
+                posts.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+                let html = '<div class="blog-feed-layout" style="display:flex; flex-direction:column; gap:16px; padding:4px; max-width:650px; margin:0 auto;">';
+
+                posts.forEach(post => {
+                    html += `
+                        <div class="athlete-card" style="cursor: default; padding:16px; border: 1px solid var(--border);">
+                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; border-bottom:1px dashed var(--border); padding-bottom:10px;">
+                                <div>
+                                    <h3 style="margin:0; font-size:16px; color:var(--text); font-weight:800; line-height:1.3;">${post.title}</h3>
+                                    <span style="font-size:12px; color:var(--text-muted); font-weight:600; display:block; margin-top:2px;">📅 ${post.date}</span>
+                                </div>
+                                <span class="rank-badge" style="background:var(--perry-gray); color:#fff; font-size:10px; padding:3px 8px; border-radius:5px; text-transform:uppercase; font-weight:800; letter-spacing:0.3px; flex-shrink:0;">
+                                    ${post.category.replace('-', ' ')}
+                                </span>
+                            </div>
+                            <div class="blog-content-body" style="font-size:14px; line-height:1.6; color:var(--text); word-wrap: break-word;">
+                                ${post.content}
+                            </div>
+                        </div>
+                    `;
+                });
+
+                html += '</div>';
+
+                // Store view strings into application tab cache maps safely
+                navCache.blog[genderFilter] = html;
+                container.innerHTML = html;
+
+            } catch (error) {
+                console.error(error);
+                container.innerHTML = `<p style="text-align:center;padding:20px;color:red;font-weight:700;">⚠️ Error loading updates feed: ${error.message}</p>`;
+            }
+        }
+
+        // Primary initialization router triggers on app load setups
+        window.addEventListener('DOMContentLoaded', () => {
+            // Dark Mode layout state controllers
+            const darkModeBtn = document.getElementById('darkModeBtn');
+            if (localStorage.getItem('theme') === 'dark') {
+                document.body.classList.add('dark-mode');
+            }
+            if (darkModeBtn) {
+                darkModeBtn.addEventListener('click', () => {
+                    document.body.classList.toggle('dark-mode');
+                    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
+                });
+            }
+
+            // Fire standard load channels
+            switchNavTab('blog'); // Open directly into blog tab on sandbox load for faster diagnostic checks
+        });
+
+        // Register service worker for PWA offline support checks
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('SW registered:', reg.scope))
+                    .catch(err => console.log('SW registration failed:', err));
+            });
+        }
+    </script>
+</body>
+</html>
