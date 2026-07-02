@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perry News Post Composer</title>
+<style>
+    :root {
+        --primary: #000000;
+        --accent: #ffdd00;
+        --perry-gray: #53565A;
+        --bg: #f8fafc;
+        --card-bg: #ffffff;
+        --text: #0f172a;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+    }
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif; background:var(--bg); color:var(--text); }
+    header { background:var(--primary); border-bottom:4px solid var(--accent); padding:16px 20px; }
+    header h1 { color:#fff; font-size:17px; margin:0 0 3px; }
+    header p { color:#aaa; font-size:12px; margin:0; }
+    .wrap { max-width:1100px; margin:0 auto; padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:20px; }
+    @media (max-width:820px) { .wrap { grid-template-columns:1fr; } }
+    .panel { background:var(--card-bg); border:2px solid var(--border); border-radius:12px; padding:16px; }
+    .panel h2 { font-size:12px; text-transform:uppercase; letter-spacing:0.4px; color:var(--perry-gray); margin:0 0 12px; }
+    label { display:block; font-size:12px; font-weight:800; color:var(--text-muted); margin:12px 0 5px; text-transform:uppercase; letter-spacing:0.3px; }
+    label:first-of-type { margin-top:0; }
+    input[type=text], input[type=date], textarea, select {
+        width:100%; padding:9px 10px; border:2px solid var(--border); border-radius:8px;
+        font-size:14px; font-family:inherit; color:var(--text); background:var(--bg);
+    }
+    textarea { min-height:180px; resize:vertical; line-height:1.5; }
+    .sport-row { display:flex; gap:8px; }
+    .sport-row button { flex:1; padding:9px; border:2px solid var(--border); border-radius:8px; background:var(--bg); font-weight:800; font-size:12px; text-transform:uppercase; cursor:pointer; color:var(--text-muted); }
+    .sport-row button.active { background:var(--primary); color:var(--accent); border-color:var(--primary); }
+    .toolbar { display:flex; gap:6px; margin-bottom:6px; }
+    .toolbar button { background:var(--primary); color:var(--accent); border:none; border-radius:6px; padding:6px 10px; font-size:12px; font-weight:800; cursor:pointer; }
+    .toolbar button:hover { opacity:0.85; }
+    .hint { font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.5; }
+    .imgrow { display:flex; gap:8px; margin-bottom:6px; }
+    .imgrow input { flex:1; }
+    .imgrow button { background:none; border:2px solid var(--border); border-radius:8px; padding:0 12px; cursor:pointer; color:var(--text-muted); font-weight:800; }
+    #addImageBtn { margin-top:6px; background:none; border:2px dashed var(--border); border-radius:8px; padding:8px; width:100%; cursor:pointer; color:var(--perry-gray); font-weight:800; font-size:12px; text-transform:uppercase; }
+
+    /* Preview column — mirrors news-article styling from the main app */
+    .news-badge { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.4px; padding:2px 7px; border-radius:20px; color:#000; }
+    .news-badge.xc { background:var(--accent); }
+    .news-badge.track { background:#60a5fa; }
+    .news-article-title { font-size:19px; font-weight:900; color:var(--text); line-height:1.25; margin:8px 0 4px; }
+    .news-article-date { font-size:12px; font-weight:700; color:var(--text-muted); margin-bottom:14px; }
+    .news-article-img { width:100%; border-radius:10px; margin-bottom:12px; display:block; background:var(--border); }
+    .news-body-list { margin:6px 0 14px 18px; padding:0; }
+    .news-body-list li { font-size:14px; line-height:1.6; color:var(--text); margin-bottom:4px; }
+    .news-article-body p { font-size:14px; line-height:1.7; color:var(--text); margin:0 0 14px; }
+    .news-article-body a { color:var(--perry-gray); text-decoration:underline; }
+    .preview-empty { color:var(--text-muted); font-style:italic; font-size:13px; }
+
+    #codeOutBtn { width:100%; margin-top:16px; background:var(--primary); color:var(--accent); border:3px solid var(--accent); border-radius:10px; padding:12px; font-size:14px; font-weight:800; text-transform:uppercase; cursor:pointer; }
+    #codeOutWrap { margin-top:14px; display:none; }
+    #codeOut { width:100%; min-height:180px; font-family:'SF Mono',Consolas,monospace; font-size:12px; background:#111318; color:#e8eaf0; border-radius:8px; border:none; padding:12px; }
+    #copyBtn { margin-top:8px; width:100%; background:none; border:2px solid var(--border); border-radius:8px; padding:9px; font-weight:800; cursor:pointer; color:var(--text); }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>📰 Perry News Post Composer</h1>
+    <p>Draft an update offline, preview it exactly as it'll look in the app, then paste the generated code into news-posts.js</p>
+</header>
+
+<div class="wrap">
+    <div class="panel">
+        <h2>Write</h2>
+
+        <label>Sport</label>
+        <div class="sport-row">
+            <button type="button" class="active" data-sport="xc" onclick="setSport('xc')">Cross Country</button>
+            <button type="button" data-sport="track" onclick="setSport('track')">Track</button>
+        </div>
+
+        <label for="fTitle">Title</label>
+        <input type="text" id="fTitle" placeholder="Boys Beat Hoover in Federal League Dual" oninput="updatePreview()">
+
+        <label for="fDate">Date</label>
+        <input type="date" id="fDate" oninput="updatePreview()">
+
+        <label for="fBody">Story</label>
+        <div class="toolbar">
+            <button type="button" onclick="wrapSelection('**','**')">Bold</button>
+            <button type="button" onclick="wrapSelection('*','*')">Italic</button>
+            <button type="button" onclick="insertBullet()">• Bullet</button>
+            <button type="button" onclick="insertLink()">🔗 Link</button>
+        </div>
+        <textarea id="fBody" placeholder="Great team effort tonight at Hoover..." oninput="updatePreview()"></textarea>
+        <p class="hint">Blank line = new paragraph. A line starting with "- " becomes a bullet point. Select text and click Bold/Italic to wrap it.</p>
+
+        <label>Photos</label>
+        <div id="imageRows"></div>
+        <button type="button" id="addImageBtn" onclick="addImageRow()">+ Add Photo</button>
+        <p class="hint">Drop the photo file into the <strong>news-images/</strong> folder in your GitHub repo, then enter its filename here, e.g. <code>news-images/2026-09-13-hoover-1.jpg</code>. A full Google Drive/other image URL also works.</p>
+
+        <button type="button" id="codeOutBtn" onclick="generateCode()">Generate Code →</button>
+        <div id="codeOutWrap">
+            <label style="margin-top:0;">Paste this into the NEWS_POSTS array in news-posts.js</label>
+            <textarea id="codeOut" readonly onclick="this.select()"></textarea>
+            <button type="button" id="copyBtn" onclick="copyCode()">📋 Copy to Clipboard</button>
+        </div>
+    </div>
+
+    <div class="panel">
+        <h2>Preview — exactly how it'll look on the News page</h2>
+        <div id="previewArea"><p class="preview-empty">Start typing to see a preview…</p></div>
+    </div>
+</div>
+
+<script src="news-render.js"></script>
+<script>
+    let currentSport = 'xc';
+    document.getElementById('fDate').value = new Date().toISOString().slice(0,10);
+
+    function setSport(sport) {
+        currentSport = sport;
+        document.querySelectorAll('.sport-row button').forEach(b => b.classList.toggle('active', b.dataset.sport === sport));
+        updatePreview();
+    }
+
+    function wrapSelection(before, after) {
+        const ta = document.getElementById('fBody');
+        const start = ta.selectionStart, end = ta.selectionEnd;
+        const val = ta.value;
+        const selected = val.slice(start, end) || 'text';
+        ta.value = val.slice(0, start) + before + selected + after + val.slice(end);
+        ta.focus();
+        ta.selectionStart = start + before.length;
+        ta.selectionEnd = start + before.length + selected.length;
+        updatePreview();
+    }
+
+    function insertBullet() {
+        const ta = document.getElementById('fBody');
+        const start = ta.selectionStart;
+        const val = ta.value;
+        const needsNewline = start > 0 && val[start-1] !== '\n';
+        const insert = (needsNewline ? '\n' : '') + '- ';
+        ta.value = val.slice(0, start) + insert + val.slice(start);
+        ta.focus();
+        ta.selectionStart = ta.selectionEnd = start + insert.length;
+        updatePreview();
+    }
+
+    function insertLink() {
+        const url = prompt('Link URL (e.g. https://www.athletic.net/team/7900/cross-country/2026):');
+        if (!url) return;
+        const text = prompt('Link text (what the reader sees):', 'results') || 'link';
+        wrapSelectionCustom(`[${text}](${url})`);
+    }
+
+    function wrapSelectionCustom(str) {
+        const ta = document.getElementById('fBody');
+        const start = ta.selectionStart, end = ta.selectionEnd;
+        ta.value = ta.value.slice(0, start) + str + ta.value.slice(end);
+        ta.focus();
+        updatePreview();
+    }
+
+    function addImageRow(value) {
+        const wrap = document.getElementById('imageRows');
+        const row = document.createElement('div');
+        row.className = 'imgrow';
+        row.innerHTML = `<input type="text" class="imgInput" placeholder="news-images/filename.jpg" oninput="updatePreview()">
+                          <button type="button" onclick="this.parentElement.remove(); updatePreview();">✕</button>`;
+        wrap.appendChild(row);
+        if (value) row.querySelector('input').value = value;
+    }
+
+    function getImages() {
+        return [...document.querySelectorAll('.imgInput')].map(i => i.value.trim()).filter(Boolean);
+    }
+
+    function updatePreview() {
+        const title = document.getElementById('fTitle').value.trim();
+        const dateStr = document.getElementById('fDate').value;
+        const body = document.getElementById('fBody').value;
+        const images = getImages();
+        const preview = document.getElementById('previewArea');
+
+        if (!title && !body) {
+            preview.innerHTML = '<p class="preview-empty">Start typing to see a preview…</p>';
+            return;
+        }
+
+        const badgeClass = currentSport === 'track' ? 'track' : 'xc';
+        const badgeLabel = currentSport === 'track' ? 'Track' : 'XC';
+        const dateLabel = dateStr
+            ? new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' })
+            : '';
+        const imagesHtml = images.map(src => `<img class="news-article-img" src="${src}" alt="" onerror="this.style.display='none'">`).join('');
+
+        preview.innerHTML = `
+            <span class="news-badge ${badgeClass}">${badgeLabel}</span>
+            <div class="news-article-title">${title || '(untitled)'}</div>
+            <div class="news-article-date">${dateLabel}</div>
+            ${imagesHtml}
+            <div class="news-article-body">${renderNewsBody(body)}</div>
+        `;
+    }
+
+    function slugify(str) {
+        return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60);
+    }
+
+    function generateCode() {
+        const title = document.getElementById('fTitle').value.trim();
+        const dateStr = document.getElementById('fDate').value;
+        const body = document.getElementById('fBody').value;
+        const images = getImages();
+
+        if (!title || !dateStr) {
+            alert('Add at least a title and date first.');
+            return;
+        }
+
+        const id = `${dateStr}-${slugify(title)}`;
+        const obj = {
+            id, sport: currentSport, date: dateStr, title, body, images
+        };
+
+        // Hand-format so it reads nicely when pasted into news-posts.js
+        const lines = [];
+        lines.push('    {');
+        lines.push(`        id: ${JSON.stringify(obj.id)},`);
+        lines.push(`        sport: ${JSON.stringify(obj.sport)},`);
+        lines.push(`        date: ${JSON.stringify(obj.date)},`);
+        lines.push(`        title: ${JSON.stringify(obj.title)},`);
+        lines.push(`        body: ${JSON.stringify(obj.body)},`);
+        lines.push(`        images: ${JSON.stringify(obj.images)}`);
+        lines.push('    },');
+
+        document.getElementById('codeOut').value = lines.join('\n');
+        document.getElementById('codeOutWrap').style.display = 'block';
+        document.getElementById('codeOutWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }
+
+    function copyCode() {
+        const el = document.getElementById('codeOut');
+        el.select();
+        navigator.clipboard.writeText(el.value).then(() => {
+            const btn = document.getElementById('copyBtn');
+            const orig = btn.textContent;
+            btn.textContent = '✓ Copied!';
+            setTimeout(() => btn.textContent = orig, 1500);
+        }).catch(() => {
+            document.execCommand('copy');
+        });
+    }
+
+    addImageRow();
+</script>
+</body>
+</html>
