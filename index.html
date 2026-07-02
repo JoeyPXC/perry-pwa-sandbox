@@ -3,20 +3,17 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Perry Track / XC</title>
+    <title>Perry Track & XC News</title>
     <meta name="theme-color" content="#000000">
     <link rel="icon" type="image/png" href="Mass. Perry Black Outline.png">
     <link rel="manifest" href="manifest.json">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black">
-    <meta name="apple-mobile-web-app-title" content="Perry Track/XC">
-    <link rel="apple-touch-icon" href="Mass. Perry Black Outline.png">
 
     <style>
         :root {
             --primary: #000000;
-            --primary-light: #1a1a1a;
             --accent: #ffdd00;
             --perry-gray: #53565A;
             --bg: #f8fafc;
@@ -24,810 +21,156 @@
             --text: #0f172a;
             --text-muted: #64748b;
             --border: #e2e8f0;
-            --success: #166534;
         }
-
-        body.dark-mode {
-            --primary: #000000;
-            --primary-light: #1a1a1a;
-            --accent: #ffdd00;
-            --perry-gray: #a0a4a8;
-            --bg: #111318;
-            --card-bg: #1c1f26;
-            --text: #e8eaf0;
-            --text-muted: #8892a4;
-            --border: #2a2d36;
-            --success: #4ade80;
-            --on-dark-text: #e8eaf0;
-        }
-
-        /* Custom scrollbars — gray thumb that pops yellow on hover,
-           matching the Perry color scheme. Firefox via scrollbar-color,
-           Chrome/Safari/Edge via the ::-webkit-scrollbar pseudo-elements. */
-        html {
-            scrollbar-color: var(--perry-gray) var(--bg);
-            scrollbar-width: thin;
-        }
-        ::-webkit-scrollbar { width: 12px; height: 12px; }
-        ::-webkit-scrollbar-track { background: var(--bg); }
-        ::-webkit-scrollbar-thumb { background: var(--perry-gray); border-radius: 6px; border: 2px solid var(--bg); }
-        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
-
-        body.dark-mode .rank-table { background: var(--card-bg); }
-        body.dark-mode .rank-table tbody tr:nth-child(even) { background: #1a1d24; }
-        body.dark-mode .rank-table tbody tr:hover, body.dark-mode .rank-table tbody tr:nth-child(even):hover { background: #22262f; }
-        body.dark-mode .leaderboard-select { background-color: var(--card-bg); color: var(--text); border-color: var(--border); }
-        body.dark-mode .athlete-card, body.dark-mode .card-toggle-header, body.dark-mode .card-expand-body { background: var(--card-bg); }
-        body.dark-mode .meet-dashboard, body.dark-mode .career-row-card { background: var(--card-bg); }
-        body.dark-mode .career-row-card:hover { background: #22262f; }
-        body.dark-mode .career-grid, body.dark-mode .checkbox-grid { background: #16191f; }
-        body.dark-mode .career-block { background: var(--card-bg); border-color: var(--border); }
-        body.dark-mode .career-block.is-pr-year { background: #2a1f00; border-color: #b45309; }
-        body.dark-mode .event-row { background: #16191f; }
-        body.dark-mode .prog-step { background: var(--card-bg); border-color: var(--border); }
-        body.dark-mode .team-roster-breakdown-panel { background: #16191f; }
-        body.dark-mode .team-accordion-group { background: var(--card-bg); border-color: var(--border); }
-        body.dark-mode .team-score-card { background: var(--card-bg); }
-        body.dark-mode .team-score-card:hover { background: #22262f; }
-        body.dark-mode .team-accordion-group.place-1 .team-score-card { background: #2a1f00; }
-        body.dark-mode .team-accordion-group.place-1 .team-score-card:hover { background: #33270a; }
-        body.dark-mode .breakdown-row-item { border-bottom-color: #2a2d36; }
-        body.dark-mode .breakdown-panel-header { border-bottom-color: #2a2d36; }
-        body.dark-mode .drawer-content { background: var(--bg); }
-        body.dark-mode .drawer-header { background: var(--card-bg); }
-        body.dark-mode .modal-search-box input { background: var(--bg); color: var(--text); }
-        body.dark-mode .rank-table tr.highlighted-row { background: #2a1f00 !important; }
-        body.dark-mode .rank-table tr.highlighted-row:hover { background: #33270a !important; }
-        body.dark-mode .season-stat-block { background: var(--card-bg) !important; border-color: var(--border) !important; }
-        body.dark-mode .season-stat-block .stat-item { background: #16191f !important; }
-        body.dark-mode .stat-value { color: #e8eaf0 !important; }
-        body.dark-mode .stat-label { color: #8892a4 !important; }
-        /* Fix athlete name/time colors in dark mode - they use hardcoded primary (black) */
-        body.dark-mode .rank-table td .lbd-name { color: #e8eaf0 !important; }
-        body.dark-mode .rank-table td .lbd-time { color: #e8eaf0 !important; }
-        body.dark-mode .rank-table td .lbd-yr { color: #a0a4a8 !important; }
-        body.dark-mode .rank-table td .lbd-class-pill { background: #ffdd00 !important; color: #000000 !important; }
-        body.dark-mode .team-score-name, body.dark-mode .breakdown-row-item { color: #e8eaf0; }
-        body.dark-mode .breakdown-panel-title { color: #a0a4a8; }
-        body.dark-mode .checkbox-label { color: #e8eaf0; }
-        body.dark-mode .team-score-pts { color: #e8eaf0; }
-        body.dark-mode .squad-subname { color: #8892a4 !important; }
-        body.dark-mode .score-points-label { color: #f59e0b; }
-        /* Athlete card text */
-        body.dark-mode .athlete-name { color: #e8eaf0; }
-        body.dark-mode .athlete-grad-text { color: #a0a4a8; }
-        body.dark-mode .card-expand-body { background: var(--card-bg) !important; border-top-color: var(--border); }
-        body.dark-mode .event-title { color: #e8eaf0; }
-        body.dark-mode .career-val { color: #e8eaf0; }
-        body.dark-mode .career-lbl { color: #a0a4a8; }
-        body.dark-mode .career-name { color: #e8eaf0; }
-        body.dark-mode .career-grad { color: #a0a4a8; }
-        body.dark-mode .career-num { color: #a0a4a8; }
-        body.dark-mode .prog-val { color: #e8eaf0; }
-        body.dark-mode .prog-label { color: #a0a4a8; border-bottom-color: var(--border); }
-        /* Collegiate Runners page */
-        body.dark-mode .collapsible-toggle, body.dark-mode .collapsible-body { background: var(--card-bg); border-color: var(--border); }
-        body.dark-mode .alumni-breakdown-spacer { background: #16191f; }
-
-        /* ── Compare mode ─────────────────────────────────────────────── */
-        .compare-mode-btn { padding: 6px 12px; border-radius: 8px; font-size: 11px; font-weight: 800; border: 2px solid var(--border); background: none; color: var(--text-muted); cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.15s; white-space: nowrap; }
-        .compare-mode-btn.active { border-color: var(--accent); background: var(--primary); color: var(--accent); }
-        .athlete-card.compare-selected { border: 2px solid var(--accent) !important; background: rgba(255,221,0,0.06) !important; }
-        .compare-check { display: none; font-size: 16px; position: absolute; top: 8px; right: 8px; }
-        .compare-mode .athlete-card { position: relative; cursor: pointer; }
-        .compare-mode .athlete-card.compare-selected .compare-check { display: block; }
-        .compare-bar { position: fixed; bottom: 0; left: 0; right: 0; background: var(--primary); border-top: 3px solid var(--accent); padding: 10px 16px; display: flex; align-items: center; justify-content: space-between; gap: 10px; z-index: 9999; transform: translateY(100%); transition: transform 0.25s; }
-        .compare-bar.visible { transform: translateY(0); }
-        .compare-bar-names { font-size: 12px; font-weight: 700; color: #e8eaf0; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .compare-bar-btn { background: var(--accent); color: var(--primary); border: none; border-radius: 8px; padding: 8px 16px; font-size: 13px; font-weight: 800; cursor: pointer; white-space: nowrap; }
-        .compare-bar-clear { background: none; border: 2px solid #555; color: #aaa; border-radius: 8px; padding: 8px 12px; font-size: 12px; font-weight: 700; cursor: pointer; white-space: nowrap; }
-
-        /* Compare panel */
-        .compare-panel-overlay { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: none; flex-direction: column; overflow: hidden; }
-        .compare-panel-overlay.open { display: flex; }
-        .compare-panel-header { background: var(--primary); border-bottom: 3px solid var(--accent); padding: 12px 16px; display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-        .compare-panel-title { font-size: 14px; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
-        .compare-panel-close { background: none; border: 2px solid #555; color: #aaa; border-radius: 8px; padding: 6px 12px; font-size: 13px; cursor: pointer; font-weight: 700; }
-        .compare-panel-body { flex: 1; overflow-y: auto; padding: 12px; }
-        .compare-event-section { margin-bottom: 18px; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; }
-        .compare-event-header { background: var(--primary); color: var(--accent); padding: 7px 12px; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; }
-        .compare-grid { display: grid; gap: 0; }
-        .compare-row { display: grid; border-bottom: 1px solid var(--border); }
-        .compare-row.header-row { background: rgba(0,0,0,0.04); font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); }
-        body.dark-mode .compare-row.header-row { background: #16191f; }
-        .compare-cell { padding: 7px 10px; font-size: 12px; font-weight: 700; color: var(--text); border-right: 1px solid var(--border); }
-        .compare-cell:last-child { border-right: none; }
-        .compare-cell.grade-col { color: var(--text-muted); font-size: 11px; }
-        .compare-cell.best-time { color: #b45309; font-weight: 800; }
-        body.dark-mode .compare-cell.best-time { color: var(--accent); }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
-        body { background-color: var(--bg); color: var(--text); padding-bottom: 40px; overflow-x: hidden; }
+        body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
         
         header { 
             background: var(--primary); 
             color: white; 
-            padding: 6px 16px 10px; 
-            text-align: center; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            gap: 0; 
-            position: relative; 
+            padding: 20px 16px; 
+            text-align: center;
+            position: relative;
         }
-
-        /* Checkerboard accent strip — replaces the old solid yellow line
-           under the header. Built as a small tiled SVG (2x2 squares) so no
-           extra image asset is needed; matches the checkered-uniform look. */
+        header h1 { font-size: 24px; font-weight: 800; color: #ffffff; }
+        header p { color: var(--accent); font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-top: 4px; }
+        
         .checker-border {
-            height: 16px;
+            height: 12px;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16'%3E%3Crect width='16' height='16' fill='%23ffdd00'/%3E%3Crect width='8' height='8' fill='%23000000'/%3E%3Crect x='8' y='8' width='8' height='8' fill='%23000000'/%3E%3C/svg%3E");
             background-size: 16px 16px;
-            flex-shrink: 0;
         }
 
-        /* Boys / Girls / All toggle, shown just below the checkerboard
-           strip at the top of the page. */
-        .gender-toggle-row { display: flex; justify-content: center; padding: 10px 12px 0; }
-        .gender-toggle-group { display: inline-flex; background: var(--card-bg); border: 2px solid var(--primary); border-radius: 10px; overflow: hidden; }
-        .gender-toggle-btn { border: none; background: none; color: var(--text); font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 8px 22px; cursor: pointer; transition: all 0.15s; }
-        .gender-toggle-btn + .gender-toggle-btn { border-left: 2px solid var(--primary); }
-        .gender-toggle-btn.active { background: var(--primary); color: var(--accent); }
-        .nav-gender-toggle-row { display: flex; justify-content: center; padding: 10px 12px; background: var(--bg); border-bottom: 1px solid var(--border); flex-shrink: 0; }
-
-        /* Site footer — Panther mark, program name, and social links.
-           Bookends the checkerboard strip from the header. */
-        .site-footer {
-            background: var(--primary);
-            color: white;
-            text-align: center;
-            padding: 20px 16px 24px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 10px;
-        }
-        .footer-panther-logo { width: 90px; height: auto; }
-        .footer-title { font-size: 13px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: #e2e8f0; margin: 0; }
-        .footer-socials { display: flex; gap: 14px; margin-top: 4px; }
-        .footer-social-link { display: flex; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); transition: background 0.2s; }
-        .footer-social-link:hover { background: rgba(255,255,255,0.2); }
-        .footer-social-link svg { width: 20px; height: 20px; fill: white; }
-
+        .container { max-width: 650px; margin: 0 auto; padding: 16px; }
         
-        .logo-img { max-width: 140px; height: auto; display: block; margin-bottom: -20px; }
-        header h1 { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: #ffffff; margin: 0; }
-        header p { color: #e2e8f0; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
-        
-        .header-sync-btn { position: absolute; top: 12px; right: 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s; z-index: 10; }
-        .header-sync-btn:hover { background: rgba(255,255,255,0.2); }
-        .header-sync-btn svg { width: 20px; height: 20px; fill: #ffffff; transition: transform 0.5s ease; }
-        .header-sync-btn.spinning svg { transform: rotate(360deg); }
+        /* Post Styling */
+        .post-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+        .post-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 12px; }
+        .post-title { font-size: 18px; font-weight: 800; color: var(--primary); }
+        .post-date { font-size: 12px; color: var(--text-muted); font-weight: 600; white-space: nowrap; margin-left: 10px; }
+        .post-content { font-size: 14px; line-height: 1.6; color: var(--text); white-space: pre-wrap; }
 
-        .container { max-width: 600px; margin: 0 auto; padding: 12px; }
-        
-        .filter-container { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-        .filter-row { display: flex; gap: 8px; width: 100%; }
-        .leaderboard-select { flex: 1; padding: 12px; border-radius: 10px; border: 2px solid var(--border); font-size: 14px; font-weight: 700; background-color: white; outline: none; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        
-        .rank-table-wrapper { border-radius: 12px; overflow: hidden; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .rank-table { width: 100%; border-collapse: collapse; background: white; table-layout: fixed; }
-        .rank-table th, .rank-table td { padding: 10px 8px; text-align: left; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; vertical-align: middle; }
-        @media (max-width: 480px) {
-            .col-grad { display: none; }
-            .col-rank { width: 32px; }
-            .col-time { width: 62px; font-size: 12px; }
-            .rank-table th, .rank-table td { padding: 8px 4px; }
-            .lbd-name { font-size: 12px; }
-            .mobile-grade-inline { display: inline !important; }
-            .time-pr-pill { padding: 2px 5px; }
-        }
-        .mobile-grade-inline { display: none; }
-        .rank-table th { background: var(--primary); color: white; }
-        
-        .col-rank { width: 44px; font-weight: 700; text-align: center; }
-        .col-rank span { display: inline-block; width: 100%; text-align: center; }
-        .col-grad { width: 52px; text-align: center; font-weight: 600; color: var(--perry-gray); }
-        .col-athlete { width: auto; }
-        .col-time { width: 100px; text-align: center; }
+        /* Admin Trigger Button */
+        .admin-trigger { position: fixed; bottom: 20px; right: 20px; background: var(--primary); border: 2px solid var(--accent); color: white; padding: 10px 16px; border-radius: 30px; font-weight: 800; font-size: 12px; text-transform: uppercase; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
 
-        .rank-table tbody tr { cursor: pointer; transition: background 0.15s ease; }
-        .rank-table tbody tr:hover { background: #f1f5f9; }
-        .rank-table tr:not(:last-child) { border-bottom: 1px solid var(--border); }
-        .rank-table tr.highlighted-row { background: #fffbeb; }
-        .rank-table tr.highlighted-row:hover { background: #fef3c7; }
+        /* Admin Panel Drawer */
+        .admin-drawer { position: fixed; bottom: 0; left: 0; right: 0; background: white; border-top: 3px solid var(--accent); max-height: 80vh; overflow-y: auto; padding: 20px; box-shadow: 0 -5px 25px rgba(0,0,0,0.15); display: none; z-index: 1000; border-top-left-radius: 16px; border-top-right-radius: 16px; }
+        .admin-drawer.open { display: block; }
+        .drawer-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .drawer-title { font-size: 16px; font-weight: 800; text-transform: uppercase; }
+        .close-btn { background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
 
-        .score-points-label { color: #b45309; font-weight: 800; font-size: 12px; margin-right: 4px; }
-        .squad-subname { font-size: 11px; font-weight: 600; color: var(--text-muted); font-style: italic; display: block; margin-top: 1px; }
-
-        .career-list-view { display: flex; flex-direction: column; gap: 10px; }
-        .career-row-card { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 12px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); display: flex; flex-direction: column; gap: 8px; cursor: pointer; transition: background 0.15s; }
-        .career-row-card:hover { background: #f8fafc; }
-        .career-row-card.highlighted-card { background: #fffbeb; border-color: #fde68a; }
-        
-        .career-main-line { display: flex; align-items: center; justify-content: space-between; }
-        .career-left-meta { display: flex; align-items: center; gap: 8px; }
-        .career-num { font-size: 14px; font-weight: 800; color: var(--perry-gray); min-width: 25px; text-align: center; }
-        .career-name { font-size: 15px; font-weight: 800; color: var(--primary); }
-        .career-grad { font-size: 12px; font-weight: 600; color: var(--perry-gray); }
-        .career-pr-pill { font-size: 13px; font-weight: 800; background: var(--accent); color: var(--primary); padding: 3px 8px; border-radius: 6px; }
-        
-        .career-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; background: #f8fafc; padding: 6px; border-radius: 8px; border: 1px solid #f1f5f9; }
-        .career-block { background: white; border: 1px solid #e2e8f0; padding: 4px 2px; border-radius: 6px; text-align: center; display: flex; flex-direction: column; justify-content: center; min-height: 44px; }
-        .career-block.is-pr-year { border: 1.5px solid #b45309; background: #fffbeb; }
-        .career-lbl { font-size: 9px; font-weight: 700; color: var(--perry-gray); text-transform: uppercase; margin-bottom: 2px; }
-        .career-val { font-size: 10px; font-weight: 700; color: var(--text); word-break: break-all; line-height: 1.1; }
-
-        .meet-dashboard { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 14px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 16px; }
-        .meet-dashboard-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .meet-dashboard h3 { font-size: 14px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; color: var(--primary); }
-        .select-all-toggle-link { font-size: 12px; font-weight: 800; color: var(--perry-gray); cursor: pointer; text-decoration: underline; text-transform: uppercase; }
-        
-        .checkbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; max-height: 150px; overflow-y: auto; padding: 8px; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; margin-bottom: 12px; }
-        .checkbox-label { display: flex; align-items: center; gap: 6px; font-size: 13px; font-weight: 700; cursor: pointer; user-select: none; }
-        .checkbox-label input { width: 16px; height: 16px; accent-color: var(--primary); }
-        
-        .meet-btn-group { display: flex; gap: 8px; }
-        .action-btn { flex: 2; background: var(--primary); color: white; border: 3px solid var(--accent); padding: 12px; border-radius: 10px; font-size: 14px; font-weight: 800; text-transform: uppercase; cursor: pointer; text-align: center; }
-        .export-btn { flex: 1; background: #2563eb; color: white; border: 3px solid #60a5fa; padding: 12px; border-radius: 10px; font-size: 13px; font-weight: 800; text-transform: uppercase; cursor: pointer; text-align: center; }
-
-        .meet-section-title { font-size: 13px; font-weight: 800; text-transform: uppercase; color: var(--perry-gray); margin: 18px 0 8px 4px; letter-spacing: 0.5px; }
-        .score-podium { display: flex; flex-direction: column; gap: 8px; margin-bottom: 16px; }
-        
-        .team-accordion-group { display: flex; flex-direction: column; background: white; border: 1px solid var(--border); border-radius: 10px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        
-        .team-score-card { border-left: 6px solid var(--perry-gray); padding: 12px; display: flex; justify-content: space-between; align-items: center; cursor: pointer; transition: background-color 0.15s; user-select: none; }
-        .team-score-card:hover { background-color: #f8fafc; }
-        .team-accordion-group.place-1 { border-left: 6px solid #d97706; }
-        .team-accordion-group.place-1 .team-score-card { border-left: none; background: #fffbeb; }
-        .team-accordion-group.place-1 .team-score-card:hover { background: #fef3c7; }
-        .team-accordion-group.place-2 { border-left: 6px solid #475569; }
-        .team-accordion-group.place-2 .team-score-card { border-left: none; }
-        .team-accordion-group.place-3 { border-left: 6px solid #b45309; }
-        .team-accordion-group.place-3 .team-score-card { border-left: none; }
-        
-        .team-score-name { font-size: 14px; font-weight: 800; display: flex; align-items: center; gap: 6px; }
-        .team-score-pts { font-size: 16px; font-weight: 900; color: var(--primary); display: flex; align-items: center; gap: 6px; }
-        .tiebreaker-badge { font-size: 9px; background: #b45309; color: white; padding: 2px 5px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
-        
-        .accordion-chevron { width: 18px; height: 18px; fill: var(--perry-gray); transition: transform 0.2s ease; }
-        .team-accordion-group.expanded .accordion-chevron { transform: rotate(180deg); }
-
-        .team-roster-breakdown-panel { background: #f8fafc; border-top: 1px solid var(--border); padding: 12px; display: none; }
-        .team-accordion-group.expanded .team-roster-breakdown-panel { display: block; }
-        .breakdown-panel-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; border-bottom: 1px solid #cbd5e1; padding-bottom: 4px; }
-        .breakdown-panel-title { font-size: 12px; font-weight: 800; text-transform: uppercase; color: var(--perry-gray); }
-        .breakdown-row-item { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; font-weight: 600; border-bottom: 1px dashed #e2e8f0; }
-        .breakdown-row-item.displacer { color: var(--text-muted); font-weight: 500; }
-
-        .search-trigger-fab { position: fixed; bottom: 24px; right: 24px; background: var(--primary); border: 3px solid var(--accent); color: white; width: 56px; height: 56px; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,0.25); cursor: pointer; z-index: 95; transition: opacity 0.2s ease, transform 0.2s ease; }
-        .search-trigger-fab:hover { transform: scale(1.05); }
-        .search-trigger-fab svg { width: 24px; height: 24px; fill: white; }
-
-        /* ── Sliding Side Drawer Navigation Menu ──────────────────────── */
-        .hamburger-btn { position: absolute; top: 12px; left: 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; z-index: 10; }
-        .hamburger-btn:hover { background: rgba(255,255,255,0.2); }
-        .hamburger-icon-main { font-size: 20px; color: #ffffff; line-height: 1; margin-top: -2px; }
-
-        .drawer-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 99990; display: none; opacity: 0; transition: opacity 0.25s ease; }
-        .drawer-overlay.open { display: block; opacity: 1; }
-        .drawer-content { position: fixed; top: 0; bottom: 0; left: 0; width: 280px; background: white; z-index: 99995; transform: translateX(-100%); transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1); display: flex; flex-direction: column; box-shadow: 4px 0 12px rgba(0,0,0,0.15); }
-        .drawer-content.open { transform: translateX(0); }
-        .drawer-header { background: var(--primary); padding: 16px; border-bottom: 4px solid var(--accent); display: flex; align-items: center; justify-content: space-between; }
-        .drawer-header-title { font-size: 14px; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
-        .drawer-close-btn { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 24px; cursor: pointer; padding: 4px; line-height: 1; }
-        .drawer-close-btn:hover { color: white; }
-        .drawer-nav-list { list-style: none; padding: 8px 0; overflow-y: auto; flex: 1; }
-        .drawer-nav-item button { width: 100%; background: none; border: none; text-align: left; padding: 12px 20px; font-size: 14px; font-weight: 700; color: var(--text); cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.15s; border-left: 4px solid transparent; }
-        .drawer-nav-item button:hover { background: rgba(0,0,0,0.04); color: var(--primary); }
-        body.dark-mode .drawer-nav-item button:hover { background: rgba(255,255,255,0.04); color: var(--accent); }
-        .drawer-nav-item.active button { background: rgba(255,221,0,0.1); color: var(--text); border-left-color: var(--accent); font-weight: 800; }
-        body.dark-mode .drawer-nav-item.active button { background: rgba(255,221,0,0.05); color: var(--accent); border-left-color: var(--accent); }
-        .drawer-nav-icon { width: 20px; height: 20px; fill: var(--text-muted); transition: fill 0.15s; flex-shrink: 0; }
-        .drawer-nav-item:hover .drawer-nav-icon, .drawer-nav-item.active .drawer-nav-icon { fill: var(--text); }
-        body.dark-mode .drawer-nav-item.active .drawer-nav-icon { fill: var(--accent); }
-
-        /* ── Fullscreen Search Modal ──────────────────────────────────── */
-        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100000; display: none; align-items: flex-start; justify-content: center; padding: 16px; overflow-y: auto; }
-        .modal-overlay.open { display: flex; }
-        .modal-container { background: var(--card-bg); width: 100%; max-width: 500px; border-radius: 16px; border: 1px solid var(--border); box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1), 0 10px 10px -5px rgba(0,0,0,0.04); display: flex; flex-direction: column; max-height: 85vh; overflow: hidden; margin-top: 4vh; animation: modalSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
-        @keyframes modalSlideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
-        .modal-header { padding: 14px 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-        .modal-title { font-size: 14px; font-weight: 800; text-transform: uppercase; color: var(--text); letter-spacing: 0.5px; }
-        .modal-close-btn { background: none; border: none; color: var(--text-muted); font-size: 22px; cursor: pointer; line-height: 1; padding: 4px; }
-        .modal-close-btn:hover { color: var(--text); }
-        .modal-search-box { padding: 12px 16px; border-bottom: 1px solid var(--border); background: var(--card-bg); flex-shrink: 0; display: flex; align-items: center; gap: 8px; }
-        .modal-search-box input { flex: 1; padding: 10px 14px; border-radius: 8px; border: 1px solid var(--border); font-size: 14px; font-weight: 600; outline: none; background: #f8fafc; color: var(--text); }
-        .modal-search-box input:focus { border-color: var(--perry-gray); }
-        .modal-results-list { list-style: none; overflow-y: auto; flex: 1; padding: 6px; }
-        .modal-row-item { padding: 10px 12px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: background 0.15s; border-bottom: 1px dashed var(--border); }
-        .modal-row-item:last-child { border-bottom: none; }
-        .modal-row-item:hover { background: rgba(0,0,0,0.03); }
-        body.dark-mode .modal-row-item:hover { background: rgba(255,255,255,0.03); }
-        .modal-item-name { font-size: 14px; font-weight: 700; color: var(--text); }
-        .modal-item-meta { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; }
-        .modal-empty-state { padding: 30px 16px; text-align: center; color: var(--text-muted); font-size: 13px; font-weight: 600; }
-
-        /* ── Dark Mode Toggle button asset ────────────────────────────── */
-        .dark-mode-btn { position: absolute; top: 12px; right: 68px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); border-radius: 50%; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: background 0.2s; z-index: 10; }
-        .dark-mode-btn:hover { background: rgba(255,255,255,0.2); }
-        /* Renders a pure-CSS sun/moon icon depending on the body class */
-        .dark-mode-btn::before { content: ""; width: 18px; height: 18px; border-radius: 50%; display: block; transition: all 0.3s ease; background: #ffdd00; box-shadow: inset 0 0 0 0 #000; }
-        body.dark-mode .dark-mode-btn::before { background: transparent; box-shadow: inset -5px -4px 0 0 #e8eaf0; }
-
-        /* ── Athlete card enhancements ────────────────────────────────── */
-        .athlete-card { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.02); display: flex; flex-direction: column; transition: border-color 0.15s, box-shadow 0.15s; }
-        .card-toggle-header { padding: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; background: white; }
-        .card-toggle-header:hover { background: rgba(0,0,0,0.01); }
-        body.dark-mode .card-toggle-header:hover { background: rgba(255,255,255,0.01); }
-        .card-left-info { display: flex; align-items: center; gap: 10px; min-width: 0; flex: 1; }
-        .card-avatar-circle { width: 38px; height: 38px; border-radius: 50%; background: var(--bg); border: 1px solid var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 800; color: var(--perry-gray); flex-shrink: 0; text-transform: uppercase; }
-        .athlete-name { font-size: 15px; font-weight: 800; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-        .athlete-grad-text { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-top: 1px; }
-        .card-right-actions { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
-        .card-chevron { width: 18px; height: 18px; fill: var(--text-muted); transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1); }
-        .athlete-card.expanded .card-chevron { transform: rotate(180deg); }
-        .card-expand-body { display: none; padding: 0 12px 14px; border-top: 1px dashed var(--border); background: white; }
-        .athlete-card.expanded .card-expand-body { display: block; }
-
-        /* Card sub-tables (Events / PR Grid) */
-        .card-section-title { font-size: 10px; font-weight: 800; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; margin: 12px 0 6px 2px; }
-        .event-row { display: flex; flex-direction: column; background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 6px 8px; margin-bottom: 6px; }
-        .event-row:last-child { margin-bottom: 0; }
-        .event-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding-bottom: 2px; border-bottom: 1px solid rgba(0,0,0,0.03); }
-        .event-title { font-size: 12px; font-weight: 800; color: var(--text); }
-        .event-pr { font-size: 12px; font-weight: 800; color: #b45309; display: flex; align-items: center; gap: 4px; }
-        body.dark-mode .event-pr { color: var(--accent); }
-        .progression-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
-        .prog-step { background: white; border: 1px solid var(--border); border-radius: 5px; padding: 3px 2px; text-align: center; position: relative; }
-        .prog-label { font-size: 8px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; padding-bottom: 1px; border-bottom: 1px dashed rgba(0,0,0,0.04); margin-bottom: 2px; }
-        .prog-val { font-size: 10px; font-weight: 700; color: var(--text); word-break: break-all; }
-        
-        /* Time PR small badge inside card */
-        .time-pr-badge { font-size: 8px; font-weight: 800; background: var(--accent); color: var(--primary); padding: 1px 4px; border-radius: 3px; text-transform: uppercase; line-height: 1.1; margin-left: 2px; display: inline-block; vertical-align: middle; }
-        .time-pr-pill { font-size: 10px; font-weight: 800; background: #fef3c7; color: #b45309; padding: 3px 6px; border-radius: 5px; text-transform: uppercase; letter-spacing: 0.3px; border: 1px solid #fde68a; display: inline-flex; align-items: center; gap: 3px; }
-        body.dark-mode .time-pr-pill { background: #2a1f00; color: var(--accent); border-color: #b45309; }
-
-        /* Card meet history logs */
-        .card-history-table { width: 100%; border-collapse: collapse; margin-top: 4px; }
-        .card-history-table th { background: none; color: var(--text-muted); font-size: 9px; font-weight: 700; text-transform: uppercase; padding: 4px; border-bottom: 1px solid var(--border); }
-        .card-history-table td { padding: 6px 4px; font-size: 11px; font-weight: 600; color: var(--text); border-bottom: 1px dashed var(--border); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-history-table tr:last-child td { border-bottom: none; }
-        .card-history-table .col-hist-meet { width: auto; font-weight: 700; }
-        .card-history-table .col-hist-time { width: 64px; text-align: center; font-weight: 700; }
-        .card-history-table .col-hist-place { width: 44px; text-align: center; color: var(--text-muted); }
-
-        /* Card collegiate bests section */
-        .card-posths-section { border: 1px solid var(--border); border-radius: 8px; margin-top: 8px; overflow: hidden; background: rgba(0,0,0,0.01); }
-        body.dark-mode .card-posths-section { background: rgba(255,255,255,0.01); }
-        .card-posths-toggle { padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
-        .card-posths-title { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text); display: flex; align-items: center; gap: 4px; }
-        .card-posths-chevron { width: 14px; height: 14px; fill: var(--text-muted); transition: transform 0.2s; }
-        .card-posths-section.expanded .card-posths-chevron { transform: rotate(180deg); }
-        .card-posths-body { display: none; padding: 2px 10px 8px; border-top: 1px dashed var(--border); background: var(--card-bg); }
-        .card-posths-section.expanded .card-posths-body { display: block; }
-        .card-posths-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px dashed var(--border); font-size: 11px; font-weight: 700; }
-        .card-posths-row:last-child { border-bottom: none; }
-        .card-posths-distance { color: var(--text-muted); }
-        .card-posths-time { color: #b45309; }
-        body.dark-mode .card-posths-time { color: var(--accent); }
-
-        /* Card video index row */
-        .card-videos-section { border: 1px solid var(--border); border-radius: 8px; margin-top: 8px; overflow: hidden; background: rgba(0,0,0,0.01); }
-        body.dark-mode .card-videos-section { background: rgba(255,255,255,0.01); }
-        .card-videos-toggle { padding: 8px 10px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; user-select: none; }
-        .card-videos-title { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--text); display: flex; align-items: center; gap: 4px; }
-        .card-videos-chevron { width: 14px; height: 14px; fill: var(--text-muted); transition: transform 0.2s; }
-        .card-videos-section.expanded .card-videos-chevron { transform: rotate(180deg); }
-        .card-videos-body { display: none; padding: 4px 10px 8px; border-top: 1px dashed var(--border); background: var(--card-bg); display: flex; flex-direction: column; gap: 4px; }
-        .card-videos-section.expanded .card-videos-body { display: flex; }
-        .card-video-link { display: flex; align-items: center; gap: 6px; padding: 6px 8px; border-radius: 6px; background: var(--bg); border: 1px solid var(--border); text-decoration: none; font-size: 11px; font-weight: 700; color: var(--text); transition: background 0.15s; }
-        .card-video-link:hover { background: rgba(0,0,0,0.04); }
-        body.dark-mode .card-video-link:hover { background: rgba(255,255,255,0.04); }
-        .card-video-link svg { width: 14px; height: 14px; fill: #ef4444; flex-shrink: 0; }
-
-        /* College logo row on roster card */
-        .card-college-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; background: rgba(0,0,0,0.02); padding: 6px 10px; border-radius: 8px; border: 1px dashed var(--border); }
-        body.dark-mode .card-college-row { background: rgba(255,255,255,0.02); }
-        .card-college-logo { height: 18px; width: auto; object-fit: contain; }
-        .card-college-text { font-size: 11px; font-weight: 700; color: var(--text); text-transform: uppercase; letter-spacing: 0.3px; }
-
-        /* ── Accomplishments layout updates ───────────────────────────── */
-        .accomp-section { margin-bottom: 16px; }
-        .accomp-section-title { font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; padding: 6px 10px; border-radius: 6px; margin-bottom: 8px; display: flex; align-items: center; gap: 6px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
-        .accomp-years { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 2px 10px; }
-        .accomp-year-chip { font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.02); cursor: pointer; transition: all 0.15s ease; user-select: none; }
-        .accomp-year-chip:hover { transform: translateY(-1px); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .accomp-gender-divider { text-align: center; font-size: 13px; font-weight: 900; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin: 16px 0 10px; position: relative; display: flex; align-items: center; justify-content: center; gap: 10px; }
-        .accomp-gender-divider::before, .accomp-gender-divider::after { content: ""; height: 2px; background: var(--border); flex: 1; }
-        
-        /* Specific color rules for chips, supporting light and dark mode rules cleanly */
-        .accomp-state-chip { background: #f0fdf4; color: #166534; border-color: #bbf7d0; }
-        body.dark-mode .accomp-state-chip { background: #14532d; color: #4ade80; border-color: #15803d; }
-        .accomp-reg-chip { background: #e0e7ff; color: #3730a3; border-color: #c7d2fe; }
-        body.dark-mode .accomp-reg-chip { background: #1e1b4b; color: #818cf8; border-color: #312e81; }
-        .accomp-dist-chip { background: #f0fdf4; color: #14532d; border-color: #bbf7d0; }
-        body.dark-mode .accomp-dist-chip { background: #14532d; color: #4ade80; border-color: #15803d; }
-        .accomp-fed-chip { background: #fef2f2; color: #991b1b; border-color: #fecaca; }
-        body.dark-mode .accomp-fed-chip { background: #451a03; color: #f87171; border-color: #7f1d1d; }
-        .accomp-stark-chip { background: #eff6ff; color: #1e3a8a; border-color: #bfdbfe; }
-        body.dark-mode .accomp-stark-chip { background: #172554; color: #60a5fa; border-color: #1e3a8a; }
-        .accomp-ind-chip { background: #fffbeb; color: #b45309; border-color: #fde68a; }
-        body.dark-mode .accomp-ind-chip { background: #2a1f00; color: var(--accent); border-color: #b45309; }
-
-        .accomp-runner-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 10px; border-bottom: 1px solid var(--border); font-size: 12px; }
-        .accomp-runner-row:last-child { border-bottom: none; }
-
-        /* Program Snapshot block (top of Accomplishments page) */
-        .program-snapshot { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 16px; }
-        .program-snapshot-title { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--perry-gray); margin-bottom: 8px; letter-spacing: 0.5px; border-bottom: 1px dashed var(--border); padding-bottom: 4px; }
-        .program-snapshot-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; }
-        .program-snapshot-item { background: #f8fafc; border: 1px solid var(--border); border-radius: 8px; padding: 8px; text-align: center; display: flex; flex-direction: column; justify-content: center; }
-        .program-snapshot-value { font-size: 16px; font-weight: 900; color: var(--text); line-height: 1.2; }
-        .program-snapshot-label { font-size: 9px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-top: 2px; line-height: 1.2; letter-spacing: 0.2px; }
-        .program-snapshot-link { grid-column: span 2; flex-direction: row; align-items: center; justify-content: center; gap: 6px; cursor: pointer; transition: background 0.15s; background: rgba(255,221,0,0.06); border-color: rgba(255,221,0,0.3); }
-        .program-snapshot-link:hover { background: rgba(255,221,0,0.12); }
-        .program-snapshot-link .card-chevron { fill: var(--text); transform: rotate(-90deg); margin-left: auto; }
-
-        /* Collegiate Runners Page additions */
-        .alumni-summary-panel { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); margin-bottom: 14px; }
-        .alumni-stat-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 6px; padding-bottom: 6px; border-bottom: 1px dashed var(--border); }
-        .alumni-stat-row:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
-        .alumni-stat-lbl { color: var(--text-muted); text-transform: uppercase; font-size: 10px; letter-spacing: 0.5px; }
-        .alumni-stat-val { font-size: 15px; font-weight: 900; }
-        .collapsible-group { border: 1px solid var(--border); border-radius: 10px; overflow: hidden; margin-bottom: 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .collapsible-toggle { padding: 10px 12px; background: white; display: flex; justify-content: space-between; align-items: center; cursor: pointer; user-select: none; }
-        .collapsible-title { font-size: 11px; font-weight: 800; text-transform: uppercase; color: var(--perry-gray); letter-spacing: 0.5px; }
-        .collapsible-group.expanded .card-chevron { transform: rotate(180deg); }
-        .collapsible-body { display: none; background: white; border-top: 1px dashed var(--border); padding: 10px; }
-        .collapsible-group.expanded .collapsible-body { display: block; }
-        .alumni-breakdown-panel { display: flex; flex-direction: column; background: #f8fafc; border-radius: 8px; border: 1px solid var(--border); padding: 4px; max-height: 200px; overflow-y: auto; }
-        .alumni-breakdown-row { display: flex; justify-content: space-between; font-size: 11px; padding: 5px 8px; font-weight: 700; border-bottom: 1px dashed var(--border); color: var(--text); }
-        .alumni-breakdown-row:last-child { border-bottom: none; }
-        .alumni-breakdown-count { color: var(--perry-gray); font-weight: 800; }
-        .alumni-simple-row { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 10px 14px; font-size: 13px; font-weight: 700; color: var(--text); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02); }
-        .alumni-simple-meta { font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; margin-top: 1px; }
-
-        /* ── Status Bar / Update notifications ─────────────────────────── */
-        .status-msg { position: fixed; top: 0; left: 0; right: 0; padding: 8px 12px; text-align: center; font-size: 12px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; z-index: 100005; color: white; display: none; box-shadow: 0 2px 8px rgba(0,0,0,0.15); animation: statusSlideIn 0.2s cubic-bezier(0, 0, 0.2, 1); }
-        @keyframes statusSlideIn { from { transform: translateY(-100%); } to { transform: translateY(0); } }
-        .status-msg.success { background: #166534; display: block; }
-        .status-msg.error { background: #991b1b; display: block; }
-        .status-msg.info { background: #1e3a8a; display: block; }
-
-        /* ── Record progression modal overlay ─────────────────────────── */
-        .progression-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 100010; display: none; align-items: center; justify-content: center; padding: 16px; }
-        .progression-overlay.open { display: flex; }
-        .progression-modal { background: var(--card-bg); border: 1px solid var(--border); width: 100%; max-width: 440px; border-radius: 16px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.15); display: flex; flex-direction: column; max-height: 80vh; overflow: hidden; animation: modalSlideUp 0.2s cubic-bezier(0.16, 1, 0.3, 1); }
-        .progression-header { padding: 12px 16px; background: var(--primary); border-bottom: 3px solid var(--accent); display: flex; align-items: center; justify-content: space-between; flex-shrink: 0; }
-        #progressionTitle { font-size: 13px; font-weight: 800; color: white; text-transform: uppercase; letter-spacing: 0.5px; }
-        .progression-close { background: none; border: none; color: rgba(255,255,255,0.7); font-size: 24px; cursor: pointer; line-height: 1; }
-        .progression-close:hover { color: white; }
-        .progression-body { padding: 12px; overflow-y: auto; flex: 1; display: flex; flex-direction: column; gap: 8px; }
-        .prog-row-card { border-left: 4px solid var(--perry-gray); padding: 8px 10px; background: rgba(0,0,0,0.01); border-top: 1px solid var(--border); border-right: 1px solid var(--border); border-bottom: 1px solid var(--border); border-radius: 0 8px 8px 0; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 700; color: var(--text); }
-        body.dark-mode .prog-row-card { background: rgba(255,255,255,0.01); }
-        .prog-row-card.is-current-record { border-left-color: #d97706; background: #fffbeb; }
-        body.dark-mode .prog-row-card.is-current-record { background: #2a1f00; }
-        .prog-row-meta { display: flex; flex-direction: column; gap: 1px; }
-        .prog-row-name { font-size: 13px; font-weight: 800; }
-        .prog-row-yr { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-        .prog-row-mark { font-size: 15px; font-weight: 900; color: #b45309; white-space: nowrap; }
-        body.dark-mode .prog-row-mark { color: var(--accent); }
-
-        /* Track records overlay block */
-        .record-banner-box { background: var(--primary); border: 2px solid var(--accent); border-radius: 12px; padding: 12px 16px; margin-bottom: 14px; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
-        .record-banner-label { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 1px; color: var(--accent); }
-        .record-banner-name { font-size: 14px; font-weight: 800; color: #ffffff; margin-top: 2px; }
-        .record-banner-time { font-size: 22px; font-weight: 900; color: var(--accent); white-space: nowrap; }
-        .record-banner-left { display: flex; flex-direction: column; min-width: 0; }
-
-        @media print {
-            body { background: #fff !important; color: #000 !important; padding: 0 !important; }
-            header, footer, .search-trigger-fab, .hamburger-btn, .dark-mode-btn, .header-sync-btn,
-            .filter-container, .nav-gender-toggle-row, .compare-bar, .compare-mode-btn { display: none !important; }
-            .container { max-width: 100% !important; width: 100% !important; padding: 0 !important; }
-            .rank-table th { background: #000 !important; color: #fff !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            .rank-table td { color: #000 !important; border-bottom: 1px solid #666 !important; }
-            .rank-table tbody tr:nth-child(even) { background: #f2f2f2 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-            #recordBanner { background: #fff !important; border-color: #cbd5e1 !important; }
-            #recordBanner .record-banner-label, #recordBanner .record-banner-name, #recordBanner .record-banner-time { color: #000 !important; }
-            .rank-table-wrapper { border: 1px solid #999; box-shadow: none; }
-        }
+        /* Form styling */
+        .form-group { margin-bottom: 14px; display: flex; flex-direction: column; gap: 4px; }
+        .form-group label { font-size: 12px; font-weight: 700; text-transform: uppercase; color: var(--perry-gray); }
+        .form-group input, .form-group textarea { width: 100%; padding: 10px; border-radius: 8px; border: 1.5px solid var(--border); font-size: 14px; outline: none; }
+        .form-group textarea { height: 120px; resize: vertical; }
+        .submit-btn { background: var(--primary); color: white; border: none; padding: 12px; border-radius: 8px; font-weight: 800; text-transform: uppercase; cursor: pointer; margin-top: 8px; }
     </style>
 </head>
 <body>
-    <div id="statusNotification" class="status-msg"></div>
-
-    <div id="progressionOverlay" class="progression-overlay" onclick="if(event.target.id==='progressionOverlay') closeRecordProgression()">
-        <div class="progression-modal">
-            <div class="progression-header">
-                <h3 id="progressionTitle">🏆 Record Progression</h3>
-                <button class="progression-close" onclick="closeRecordProgression()">&times;</button>
-            </div>
-            <div class="progression-body" id="progressionBody"></div>
-        </div>
-    </div>
 
     <header>
-        <div class="dark-mode-btn" id="darkModeBtn"></div>
-        <div class="hamburger-btn" id="hamburgerBtn" title="Menu" onclick="openHamMenu()">
-            <span class="hamburger-icon-main">☰</span>
-        </div>
-        <div class="header-sync-btn" title="Force Manual Sync" onclick="fetchLiveGoogleSheets(true)">
-            <svg viewBox="0 0 24 24"><path d="M17.65 6.35C16.2 4.9 14.21 4 12 4c-4.42 0-7.99 3.58-7.99 8s3.57 8 7.99 8c3.73 0 6.84-2.55 7.73-6h-2.08c-.82 2.33-3.04 4-5.65 4-3.31 0-6-2.69-6-6s2.69-6 6-6c1.66 0 3.14.69 4.22 1.78L13 11h7V4l-2.35 2.35z"/></svg>
-        </div>
-        <h1>Perry Track / XC</h1>
-        <p>Program Leaderboards</p>
+        <h1>Perry Track & XC</h1>
+        <p>Updates, Results & Announcements</p>
     </header>
     <div class="checker-border"></div>
 
-    <div class="drawer-overlay" id="drawerOverlay" onclick="closeHamMenu()"></div>
-    <div class="drawer-content" id="drawerContent">
+    <div class="container" id="postsContainer">
+        </div>
+
+    <button class="admin-trigger" onclick="toggleAdminDrawer()">+ Add Post</button>
+
+    <div class="admin-drawer" id="adminDrawer">
         <div class="drawer-header">
-            <span class="drawer-header-title">Navigation</span>
-            <button class="drawer-close-btn" onclick="closeHamMenu()">&times;</button>
+            <span class="drawer-title">✍️ Create New Post</span>
+            <button class="close-btn" onclick="toggleAdminDrawer()">×</button>
         </div>
-        <ul class="drawer-nav-list">
-            <li class="drawer-nav-item active" id="nav-item-leaderboards">
-                <button onclick="switchNavTab('leaderboards')">
-                    <svg class="drawer-nav-icon" viewBox="0 0 24 24"><path d="M12 2l-5.5 9h11zM5 22h14a2 2 0 002-2v-7H3v7a2 2 0 002 2z"/></svg>
-                    Leaderboards
-                </button>
-            </li>
-            <li class="drawer-nav-item" id="nav-item-rosters">
-                <button onclick="switchNavTab('rosters')">
-                    <svg class="drawer-nav-icon" viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5-4-8-4z"/></svg>
-                    Athlete Rosters
-                </button>
-            </li>
-            <li class="drawer-nav-item" id="nav-item-accomplishments">
-                <button onclick="switchNavTab('accomplishments')">
-                    <svg class="drawer-nav-icon" viewBox="0 0 24 24"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.98 5.98 0 0011 16.9V19H9v2h6v-2h-2v-2.1c2.25-.26 4.1-1.63 4.76-3.56A4.987 4.987 0 0021 8V7c0-1.1-.9-2-2-2zM5 8V7h2v3.8C5.93 10.5 5 9.37 5 8zm14 0c0 1.37-.93 2.5-2 2.8V7h2v1z"/></svg>
-                    Program Achievements
-                </button>
-            </li>
-            <li class="drawer-nav-item" id="nav-item-statequalifiers">
-                <button onclick="switchNavTab('statequalifiers')">
-                    <svg class="drawer-nav-icon" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H7c0-2.76 2.24-5 5-5s5 2.24 5 5c0 1.04-.42 1.99-1.07 2.75z"/></svg>
-                    State Qualifiers Archive
-                </button>
-            </li>
-            <li class="drawer-nav-item" id="nav-item-blog">
-                <button onclick="switchNavTab('blog')">
-                    <svg class="drawer-nav-icon" viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-1.99.9-1.99 2L2 22l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zM6 9h12v2H6V9zm8 5H6v-2h8v2zm4-6H6V6h12v2z"/></svg>
-                    Updates & News
-                </button>
-            </li>
-        </ul>
-    </div>
-
-    <div class="nav-gender-toggle-row">
-        <div class="gender-toggle-group">
-            <button class="gender-toggle-btn active" id="gbtn-A" onclick="setGlobalGenderFilter('A')">All</button>
-            <button class="gender-toggle-btn" id="gbtn-M" onclick="setGlobalGenderFilter('M')">Boys</button>
-            <button class="gender-toggle-btn" id="gbtn-F" onclick="setGlobalGenderFilter('F')">Girls</button>
-        </div>
-    </div>
-
-    <div class="container" id="mainContainer">
-        </div>
-
-    <div class="search-trigger-fab" id="searchFab" title="Search Athletes" onclick="openSearchModal()">
-        <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0016 9.5 6.5 6.5 0 109.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-    </div>
-
-    <div class="modal-overlay" id="searchModalOverlay" onclick="if(event.target.id==='searchModalOverlay') closeSearchModal()">
-        <div class="modal-container">
-            <div class="modal-header">
-                <h3 class="modal-title">🔍 Search Athletes</h3>
-                <button class="modal-close-btn" onclick="closeSearchModal()">&times;</button>
+        <form id="postForm" onsubmit="handlePostSubmit(event)">
+            <div class="form-group">
+                <label for="postTitle">Post Title</label>
+                <input type="text" id="postTitle" required placeholder="e.g., Matt McLeese Perry Relays Results">
             </div>
-            <div class="modal-search-box">
-                <input type="text" id="modalSearchInput" placeholder="Type athlete name..." oninput="handleModalSearchInput(this.value)" autocomplete="off">
+            <div class="form-group">
+                <label for="postDate">Publish Date (Change to backdate old posts)</label>
+                <input type="date" id="postDate" required>
             </div>
-            <ul class="modal-results-list" id="modalSearchResultsArea"></ul>
-        </div>
+            <div class="form-group">
+                <label for="postContent">Content</label>
+                <textarea id="postContent" required placeholder="Paste your updates or meet breakdown text here..."></textarea>
+            </div>
+            <button type="submit" class="submit-btn">Publish Post</button>
+        </form>
     </div>
-
-    <div class="compare-bar" id="compareBarHud">
-        <div class="compare-bar-names" id="compareBarNamesText"></div>
-        <button class="compare-bar-clear" onclick="clearCompareSelection()">Clear</button>
-        <button class="compare-bar-btn" onclick="openCompareOverlayPanel()">Compare</button>
-    </div>
-
-    <div class="compare-panel-overlay" id="comparePanelOverlay">
-        <div class="compare-panel-header">
-            <span class="compare-panel-title">📊 Head-to-Head Comparison</span>
-            <button class="compare-panel-close" onclick="closeComparePanel()">Close</button>
-        </div>
-        <div class="compare-panel-body" id="comparePanelBodyArea"></div>
-    </div>
-
-    <div class="checker-border" style="margin-top: 40px;"></div>
-    <footer class="site-footer">
-        <img src="Mass. Perry Black Outline.png" alt="Perry Panthers Logo" class="footer-panther-logo">
-        <p class="footer-title">Perry High School Track & Cross Country</p>
-        <div class="footer-socials">
-            <a href="https://twitter.com/PerryTrackXC" target="_blank" rel="noopener" class="footer-social-link" title="Follow us on Twitter/X">
-                <svg viewBox="0 0 24 24"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
-            </a>
-            <a href="https://instagram.com/PerryTrackXC" target="_blank" rel="noopener" class="footer-social-link" title="Follow us on Instagram">
-                <svg viewBox="0 0 24 24"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.051.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-            </a>
-        </div>
-    </footer>
 
     <script>
-        // Global variables & state trackers
-        let currentTab = 'leaderboards';
-        let genderFilter = 'A'; // 'A' = All, 'M' = Boys, 'F' = Girls
-        
-        // Expanded cache structure mapping for smooth sandbox operations
-        const navCache = {
-            leaderboards: {},
-            rosters: {},
-            accomplishments: {},
-            statequalifiers: {},
-            alumni: {},
-            blog: {} // Sandbox news feed layout placeholder
-        };
+        // Default seed data (your initial 2 sandbox posts)
+        const DEFAULT_POSTS = [
+            {
+                id: 1,
+                title: "Welcome to the New Sandbox Site",
+                date: "2026-07-01",
+                content: "Testing out the new lightweight, standalone PWA build environment. Old track and cross country updates can be co-hosted or added right here chronological order."
+            },
+            {
+                id: 2,
+                title: "Cross Country Pre-Season Prep",
+                date: "2026-06-15",
+                content: "Summer mileage tracking kicks off this week. Stay safe out there on the roads and ensure you are submitting weekly training logs."
+            }
+        ];
 
-        // UI view container binding links
-        const mainContainer = document.getElementById('mainContainer');
-
-        // Handles sidebar layout toggle drawers
-        function openHamMenu() {
-            document.getElementById('drawerOverlay').classList.add('open');
-            document.getElementById('drawerContent').classList.add('open');
+        // Load posts from localStorage (or populate default seed posts if empty)
+        function getPosts() {
+            const saved = localStorage.getItem('perry_blog_posts');
+            if (saved) {
+                return JSON.parse(saved);
+            }
+            localStorage.setItem('perry_blog_posts', JSON.stringify(DEFAULT_POSTS));
+            return DEFAULT_POSTS;
         }
-        function closeHamMenu() {
-            document.getElementById('drawerOverlay').classList.remove('open');
-            document.getElementById('drawerContent').classList.remove('open');
-        }
 
-        // Global filter controllers changing view rules synchronously
-        function setGlobalGenderFilter(g) {
-            genderFilter = g;
-            ['A', 'M', 'F'].forEach(k => {
-                document.getElementById('gbtn-' + k).classList.remove('active');
-            });
-            document.getElementById('gbtn-' + g).classList.add('active');
+        // Render posts sorted chronologically by date (newest first)
+        function renderPosts() {
+            const posts = getPosts();
+            const container = document.getElementById('postsContainer');
             
-            // Wipe active cache tabs to trigger layout rebuild instantly
-            for (const key in navCache) {
-                navCache[key] = {};
-            }
-            // Trigger dynamic re-draw
-            refreshActiveTab();
-        }
+            // Sort by date string descending
+            posts.sort((a, b) => new Date(b.date) - new Date(a.date));
 
-        // Re-routes viewing state dynamically
-        function switchNavTab(tabId) {
-            currentTab = tabId;
-            closeHamMenu();
-
-            // Toggle active list highlights
-            document.querySelectorAll('.drawer-nav-item').forEach(el => el.classList.remove('active'));
-            const activeNavItem = document.getElementById('nav-item-' + tabId);
-            if (activeNavItem) activeNavItem.classList.add('active');
-
-            // Toggle floating action display controls depending on state
-            const searchFab = document.getElementById('searchFab');
-            if (tabId === 'leaderboards' || tabId === 'rosters' || tabId === 'alumni') {
-                searchFab.style.display = 'flex';
-            } else {
-                searchFab.style.display = 'none';
-            }
-
-            refreshActiveTab();
-        }
-
-        // Redraws screen layout using safe view routing channels
-        function refreshActiveTab() {
-            if (currentTab === 'leaderboards') {
-                // Original leaderboard rendering rules remain untouched
-                mainContainer.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;">⏳ Loading leaderboards...</p>';
-                // (Fallback placeholder matching standard original asset routing)
-            } else if (currentTab === 'rosters') {
-                mainContainer.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;">⏳ Loading rosters...</p>';
-            } else if (currentTab === 'accomplishments') {
-                mainContainer.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;">⏳ Loading accomplishments...</p>';
-            } else if (currentTab === 'statequalifiers') {
-                mainContainer.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;">⏳ Loading state qualifiers Archive...</p>';
-            } else if (currentTab === 'blog') {
-                renderBlogPage(mainContainer); // Direct path connection to our rendering system
-            }
-        }
-
-        // ── CORE BLOG RENDER FUNCTION ─────────────────────────────────
-        // Fetches your posts.json file, sequences them chronologically,
-        // and appends them inside your exact CSS design system layout cards.
-        async function renderBlogPage(container) {
-            if (navCache.blog[genderFilter]) {
-                container.innerHTML = navCache.blog[genderFilter];
+            if (posts.length === 0) {
+                container.innerHTML = `<p style="text-align:center; color: var(--text-muted); padding: 40px 0;">No updates posted yet.</p>`;
                 return;
             }
 
-            container.innerHTML = '<p style="text-align:center;padding:30px;color:var(--text-muted);font-weight:600;">⏳ Loading updates & announcements...</p>';
+            container.innerHTML = posts.map(post => {
+                // Format date nicely (YYYY-MM-DD to readable format)
+                const dateOptions = { year: 'numeric', month: 'long', day: 'numeric', timeZone: 'UTC' };
+                const formattedDate = new Date(post.date).toLocaleDateString('en-US', dateOptions);
 
-            try {
-                // Fetch sandbox JSON post data assets safely
-                const response = await fetch('posts.json');
-                if (!response.ok) throw new Error('Could not retrieve blog assets.');
-                let posts = await response.json();
-
-                if (!posts || posts.length === 0) {
-                    container.innerHTML = '<p style="text-align:center;padding:20px;color:var(--text-muted);">No announcements posted yet.</p>';
-                    return;
-                }
-
-                // Filter posts dynamically using your global gender bar selections
-                if (genderFilter !== 'A') {
-                    posts = posts.filter(p => p.category === 'all' || p.category === (genderFilter === 'M' ? 'boys-track' : 'girls-track') || p.category === (genderFilter === 'M' ? 'boys-xc' : 'girls-xc') || p.category.includes(genderFilter.toLowerCase()));
-                }
-
-                // Chronological Date Sorting: Rearranges objects so backdated entries structure sequentially!
-                posts.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-                let html = '<div class="blog-feed-layout" style="display:flex; flex-direction:column; gap:16px; padding:4px; max-width:650px; margin:0 auto;">';
-
-                posts.forEach(post => {
-                    html += `
-                        <div class="athlete-card" style="cursor: default; padding:16px; border: 1px solid var(--border);">
-                            <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:12px; border-bottom:1px dashed var(--border); padding-bottom:10px;">
-                                <div>
-                                    <h3 style="margin:0; font-size:16px; color:var(--text); font-weight:800; line-height:1.3;">${post.title}</h3>
-                                    <span style="font-size:12px; color:var(--text-muted); font-weight:600; display:block; margin-top:2px;">📅 ${post.date}</span>
-                                </div>
-                                <span class="rank-badge" style="background:var(--perry-gray); color:#fff; font-size:10px; padding:3px 8px; border-radius:5px; text-transform:uppercase; font-weight:800; letter-spacing:0.3px; flex-shrink:0;">
-                                    ${post.category.replace('-', ' ')}
-                                </span>
-                            </div>
-                            <div class="blog-content-body" style="font-size:14px; line-height:1.6; color:var(--text); word-wrap: break-word;">
-                                ${post.content}
-                            </div>
+                return `
+                    <div class="post-card">
+                        <div class="post-header">
+                            <h2 class="post-title">${escapeHTML(post.title)}</h2>
+                            <span class="post-date">${formattedDate}</span>
                         </div>
-                    `;
-                });
+                        <div class="post-content">${escapeHTML(post.content)}</div>
+                    </div>
+                `;
+            }).join('');
+        }
 
-                html += '</div>';
-
-                // Store view strings into application tab cache maps safely
-                navCache.blog[genderFilter] = html;
-                container.innerHTML = html;
-
-            } catch (error) {
-                console.error(error);
-                container.innerHTML = `<p style="text-align:center;padding:20px;color:red;font-weight:700;">⚠️ Error loading updates feed: ${error.message}</p>`;
+        function toggleAdminDrawer() {
+            const drawer = document.getElementById('adminDrawer');
+            drawer.classList.toggle('open');
+            // Set default date input field to today
+            if (drawer.classList.contains('open')) {
+                document.getElementById('postDate').value = new Date().toISOString().split('T')[0];
             }
         }
 
-        // Primary initialization router triggers on app load setups
-        window.addEventListener('DOMContentLoaded', () => {
-            // Dark Mode layout state controllers
-            const darkModeBtn = document.getElementById('darkModeBtn');
-            if (localStorage.getItem('theme') === 'dark') {
-                document.body.classList.add('dark-mode');
-            }
-            if (darkModeBtn) {
-                darkModeBtn.addEventListener('click', () => {
-                    document.body.classList.toggle('dark-mode');
-                    localStorage.setItem('theme', document.body.classList.contains('dark-mode') ? 'dark' : 'light');
-                });
-            }
-
-            // Fire standard load channels
-            switchNavTab('blog'); // Open directly into blog tab on sandbox load for faster diagnostic checks
-        });
-
-        // Register service worker for PWA offline support checks
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js')
-                    .then(reg => console.log('SW registered:', reg.scope))
-                    .catch(err => console.log('SW registration failed:', err));
-            });
-        }
-    </script>
-</body>
-</html>
+        function handlePostSubmit(event) {
+            event.preventDefault();
+            
+            const title = document.
