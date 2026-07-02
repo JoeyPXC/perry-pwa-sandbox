@@ -4,6 +4,7 @@
 // matches exactly what ends up live on the site.
 //
 // Supported syntax (on purpose — kept small so it's easy to type by hand):
+//   ***bold italic***
 //   **bold**
 //   *italic*
 //   [link text](https://example.com)
@@ -23,14 +24,14 @@ function escapeHtml(str) {
 // Applies inline formatting (bold/italic/links) to an already-escaped line.
 function renderInline(escapedLine) {
     let s = escapedLine;
-    // Links: [text](url) — escapeHtml already turned quotes into &quot; etc,
-    // so this still matches fine since brackets/parens are untouched by escapeHtml.
+    // Links: [text](url)
     s = s.replace(/\[([^\]]+)\]\(([^\s)]+)\)/g,
         '<a href="$2" target="_blank" rel="noopener">$1</a>');
-    // Bold
+    // Bold+italic: ***text*** (must come before ** and * checks)
+    s = s.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+    // Bold: **text**
     s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
-    // Italic (single asterisk, but avoid eating the ** we already replaced —
-    // since bold is replaced first the remaining single *s are safe)
+    // Italic: *text* (remaining single * are safe since ** was replaced first)
     s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
     return s;
 }

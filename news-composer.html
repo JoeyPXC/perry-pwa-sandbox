@@ -34,7 +34,7 @@
     .sport-row { display:flex; gap:8px; }
     .sport-row button { flex:1; padding:9px; border:2px solid var(--border); border-radius:8px; background:var(--bg); font-weight:800; font-size:12px; text-transform:uppercase; cursor:pointer; color:var(--text-muted); }
     .sport-row button.active { background:var(--primary); color:var(--accent); border-color:var(--primary); }
-    .toolbar { display:flex; gap:6px; margin-bottom:6px; }
+    .toolbar { display:flex; gap:6px; margin-bottom:6px; flex-wrap:wrap; }
     .toolbar button { background:var(--primary); color:var(--accent); border:none; border-radius:6px; padding:6px 10px; font-size:12px; font-weight:800; cursor:pointer; }
     .toolbar button:hover { opacity:0.85; }
     .hint { font-size:11px; color:var(--text-muted); margin-top:4px; line-height:1.5; }
@@ -43,7 +43,7 @@
     .imgrow button { background:none; border:2px solid var(--border); border-radius:8px; padding:0 12px; cursor:pointer; color:var(--text-muted); font-weight:800; }
     #addImageBtn { margin-top:6px; background:none; border:2px dashed var(--border); border-radius:8px; padding:8px; width:100%; cursor:pointer; color:var(--perry-gray); font-weight:800; font-size:12px; text-transform:uppercase; }
 
-    /* Preview column — mirrors news-article styling from the main app */
+    /* Preview column */
     .news-badge { font-size:9px; font-weight:800; text-transform:uppercase; letter-spacing:0.4px; padding:2px 7px; border-radius:20px; color:#000; }
     .news-badge.xc { background:var(--accent); }
     .news-badge.track { background:#60a5fa; }
@@ -56,17 +56,23 @@
     .news-article-body a { color:var(--perry-gray); text-decoration:underline; }
     .preview-empty { color:var(--text-muted); font-style:italic; font-size:13px; }
 
-    #codeOutBtn { width:100%; margin-top:16px; background:var(--primary); color:var(--accent); border:3px solid var(--accent); border-radius:10px; padding:12px; font-size:14px; font-weight:800; text-transform:uppercase; cursor:pointer; }
-    #codeOutWrap { margin-top:14px; display:none; }
-    #codeOut { width:100%; min-height:180px; font-family:'SF Mono',Consolas,monospace; font-size:12px; background:#111318; color:#e8eaf0; border-radius:8px; border:none; padding:12px; }
-    #copyBtn { margin-top:8px; width:100%; background:none; border:2px solid var(--border); border-radius:8px; padding:9px; font-weight:800; cursor:pointer; color:var(--text); }
+    /* Output section */
+    #generateBtn { width:100%; margin-top:16px; background:var(--primary); color:var(--accent); border:3px solid var(--accent); border-radius:10px; padding:12px; font-size:14px; font-weight:800; text-transform:uppercase; cursor:pointer; }
+    #outputWrap { margin-top:14px; display:none; }
+    #outputWrap .step { background:#f1f5f9; border-radius:10px; padding:12px 14px; margin-bottom:10px; font-size:13px; }
+    #outputWrap .step strong { display:block; margin-bottom:4px; font-size:12px; text-transform:uppercase; letter-spacing:0.3px; color:var(--perry-gray); }
+    #codeOut { width:100%; min-height:160px; font-family:'SF Mono',Consolas,monospace; font-size:12px; background:#111318; color:#e8eaf0; border-radius:8px; border:none; padding:12px; margin-top:8px; resize:vertical; }
+    .btn-row { display:flex; gap:8px; margin-top:8px; }
+    .btn-row button { flex:1; padding:9px; font-weight:800; cursor:pointer; border-radius:8px; font-size:13px; }
+    #copyBtn { background:none; border:2px solid var(--border); color:var(--text); }
+    #downloadBtn { background:var(--accent); border:2px solid var(--accent); color:#000; }
 </style>
 </head>
 <body>
 
 <header>
     <h1>📰 Perry News Post Composer</h1>
-    <p>Draft an update offline, preview it exactly as it'll look in the app, then paste the generated code into news-posts.js</p>
+    <p>Write a post, preview it live, then download the updated news-posts.js file ready to drop into GitHub</p>
 </header>
 
 <div class="wrap">
@@ -87,24 +93,37 @@
 
         <label for="fBody">Story</label>
         <div class="toolbar">
-            <button type="button" onclick="wrapSelection('**','**')">Bold</button>
-            <button type="button" onclick="wrapSelection('*','*')">Italic</button>
+            <button type="button" onclick="wrapSelection('**','**')" title="Bold">B</button>
+            <button type="button" onclick="wrapSelection('*','*')" title="Italic" style="font-style:italic">I</button>
+            <button type="button" onclick="wrapSelection('***','***')" title="Bold+Italic" style="font-weight:900;font-style:italic">BI</button>
             <button type="button" onclick="insertBullet()">• Bullet</button>
             <button type="button" onclick="insertLink()">🔗 Link</button>
         </div>
         <textarea id="fBody" placeholder="Great team effort tonight at Hoover..." oninput="updatePreview()"></textarea>
-        <p class="hint">Blank line = new paragraph. A line starting with "- " becomes a bullet point. Select text and click Bold/Italic to wrap it.</p>
+        <p class="hint">
+            Blank line = new paragraph &nbsp;|&nbsp; Line starting with "- " = bullet<br>
+            Select text then click <strong>B</strong>, <strong>I</strong>, or <strong>BI</strong> to wrap it.<br>
+            Bold: <code>**text**</code> &nbsp; Italic: <code>*text*</code> &nbsp; Both: <code>***text***</code>
+        </p>
 
         <label>Photos</label>
         <div id="imageRows"></div>
         <button type="button" id="addImageBtn" onclick="addImageRow()">+ Add Photo</button>
-        <p class="hint">Drop the photo file into the <strong>news-images/</strong> folder in your GitHub repo, then enter its filename here, e.g. <code>news-images/2026-09-13-hoover-1.jpg</code>. A full Google Drive/other image URL also works.</p>
+        <p class="hint">Drop the photo file into the <strong>news-images/</strong> folder in your GitHub repo, then enter its filename here, e.g. <code>news-images/2026-09-13-hoover-1.jpg</code>. A Google Drive or other full image URL also works.</p>
 
-        <button type="button" id="codeOutBtn" onclick="generateCode()">Generate Code →</button>
-        <div id="codeOutWrap">
-            <label style="margin-top:0;">Paste this into the NEWS_POSTS array in news-posts.js</label>
-            <textarea id="codeOut" readonly onclick="this.select()"></textarea>
-            <button type="button" id="copyBtn" onclick="copyCode()">📋 Copy to Clipboard</button>
+        <button type="button" id="generateBtn" onclick="generateCode()">Generate Code →</button>
+
+        <div id="outputWrap">
+            <div class="step">
+                <strong>Step 1 — Copy this code</strong>
+                Paste it into <code>news-posts.js</code> <em>inside</em> the <code>NEWS_POSTS = [</code> array,
+                right after the opening bracket (before any existing posts). The newest post goes first.
+                <textarea id="codeOut" readonly onclick="this.select()"></textarea>
+                <div class="btn-row">
+                    <button type="button" id="copyBtn" onclick="copyCode()">📋 Copy</button>
+                    <button type="button" id="downloadBtn" onclick="downloadUpdatedFile()">⬇ Download news-posts.js</button>
+                </div>
+            </div>
         </div>
     </div>
 
@@ -114,148 +133,244 @@
     </div>
 </div>
 
-<script src="news-render.js"></script>
 <script>
-    let currentSport = 'xc';
-    document.getElementById('fDate').value = new Date().toISOString().slice(0,10);
+// ─── Embedded renderer (same logic as news-render.js) ───────────────────────
+function escapeHtml(str) {
+    return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+}
 
-    function setSport(sport) {
-        currentSport = sport;
-        document.querySelectorAll('.sport-row button').forEach(b => b.classList.toggle('active', b.dataset.sport === sport));
-        updatePreview();
-    }
+function renderInline(escapedLine) {
+    let s = escapedLine;
+    s = s.replace(/\[([^\]]+)\]\(([^\s)]+)\)/g,
+        '<a href="$2" target="_blank" rel="noopener">$1</a>');
+    // Bold+italic first
+    s = s.replace(/\*\*\*([^*]+)\*\*\*/g, '<strong><em>$1</em></strong>');
+    // Bold
+    s = s.replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>');
+    // Italic
+    s = s.replace(/\*([^*]+)\*/g, '<em>$1</em>');
+    return s;
+}
 
-    function wrapSelection(before, after) {
-        const ta = document.getElementById('fBody');
-        const start = ta.selectionStart, end = ta.selectionEnd;
-        const val = ta.value;
-        const selected = val.slice(start, end) || 'text';
-        ta.value = val.slice(0, start) + before + selected + after + val.slice(end);
-        ta.focus();
-        ta.selectionStart = start + before.length;
-        ta.selectionEnd = start + before.length + selected.length;
-        updatePreview();
-    }
-
-    function insertBullet() {
-        const ta = document.getElementById('fBody');
-        const start = ta.selectionStart;
-        const val = ta.value;
-        const needsNewline = start > 0 && val[start-1] !== '\n';
-        const insert = (needsNewline ? '\n' : '') + '- ';
-        ta.value = val.slice(0, start) + insert + val.slice(start);
-        ta.focus();
-        ta.selectionStart = ta.selectionEnd = start + insert.length;
-        updatePreview();
-    }
-
-    function insertLink() {
-        const url = prompt('Link URL (e.g. https://www.athletic.net/team/7900/cross-country/2026):');
-        if (!url) return;
-        const text = prompt('Link text (what the reader sees):', 'results') || 'link';
-        wrapSelectionCustom(`[${text}](${url})`);
-    }
-
-    function wrapSelectionCustom(str) {
-        const ta = document.getElementById('fBody');
-        const start = ta.selectionStart, end = ta.selectionEnd;
-        ta.value = ta.value.slice(0, start) + str + ta.value.slice(end);
-        ta.focus();
-        updatePreview();
-    }
-
-    function addImageRow(value) {
-        const wrap = document.getElementById('imageRows');
-        const row = document.createElement('div');
-        row.className = 'imgrow';
-        row.innerHTML = `<input type="text" class="imgInput" placeholder="news-images/filename.jpg" oninput="updatePreview()">
-                          <button type="button" onclick="this.parentElement.remove(); updatePreview();">✕</button>`;
-        wrap.appendChild(row);
-        if (value) row.querySelector('input').value = value;
-    }
-
-    function getImages() {
-        return [...document.querySelectorAll('.imgInput')].map(i => i.value.trim()).filter(Boolean);
-    }
-
-    function updatePreview() {
-        const title = document.getElementById('fTitle').value.trim();
-        const dateStr = document.getElementById('fDate').value;
-        const body = document.getElementById('fBody').value;
-        const images = getImages();
-        const preview = document.getElementById('previewArea');
-
-        if (!title && !body) {
-            preview.innerHTML = '<p class="preview-empty">Start typing to see a preview…</p>';
-            return;
-        }
-
-        const badgeClass = currentSport === 'track' ? 'track' : 'xc';
-        const badgeLabel = currentSport === 'track' ? 'Track' : 'XC';
-        const dateLabel = dateStr
-            ? new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' })
-            : '';
-        const imagesHtml = images.map(src => `<img class="news-article-img" src="${src}" alt="" onerror="this.style.display='none'">`).join('');
-
-        preview.innerHTML = `
-            <span class="news-badge ${badgeClass}">${badgeLabel}</span>
-            <div class="news-article-title">${title || '(untitled)'}</div>
-            <div class="news-article-date">${dateLabel}</div>
-            ${imagesHtml}
-            <div class="news-article-body">${renderNewsBody(body)}</div>
-        `;
-    }
-
-    function slugify(str) {
-        return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60);
-    }
-
-    function generateCode() {
-        const title = document.getElementById('fTitle').value.trim();
-        const dateStr = document.getElementById('fDate').value;
-        const body = document.getElementById('fBody').value;
-        const images = getImages();
-
-        if (!title || !dateStr) {
-            alert('Add at least a title and date first.');
-            return;
-        }
-
-        const id = `${dateStr}-${slugify(title)}`;
-        const obj = {
-            id, sport: currentSport, date: dateStr, title, body, images
+function renderNewsBody(raw) {
+    if (!raw) return '';
+    const escaped = escapeHtml(raw).replace(/\r\n/g, '\n');
+    const blocks = escaped.split(/\n\s*\n/);
+    let html = '';
+    for (const block of blocks) {
+        const lines = block.split('\n').filter(l => l.length > 0);
+        if (!lines.length) continue;
+        let i = 0;
+        let paraBuffer = [];
+        const flushPara = () => {
+            if (paraBuffer.length) {
+                html += '<p>' + paraBuffer.map(renderInline).join('<br>') + '</p>';
+                paraBuffer = [];
+            }
         };
+        while (i < lines.length) {
+            const line = lines[i];
+            if (/^-\s+/.test(line.trim())) {
+                flushPara();
+                html += '<ul class="news-body-list">';
+                while (i < lines.length && /^-\s+/.test(lines[i].trim())) {
+                    html += '<li>' + renderInline(lines[i].trim().replace(/^-\s+/, '')) + '</li>';
+                    i++;
+                }
+                html += '</ul>';
+            } else {
+                paraBuffer.push(line);
+                i++;
+            }
+        }
+        flushPara();
+    }
+    return html;
+}
+// ────────────────────────────────────────────────────────────────────────────
 
-        // Hand-format so it reads nicely when pasted into news-posts.js
-        const lines = [];
-        lines.push('    {');
-        lines.push(`        id: ${JSON.stringify(obj.id)},`);
-        lines.push(`        sport: ${JSON.stringify(obj.sport)},`);
-        lines.push(`        date: ${JSON.stringify(obj.date)},`);
-        lines.push(`        title: ${JSON.stringify(obj.title)},`);
-        lines.push(`        body: ${JSON.stringify(obj.body)},`);
-        lines.push(`        images: ${JSON.stringify(obj.images)}`);
-        lines.push('    },');
+let currentSport = 'xc';
+document.getElementById('fDate').value = new Date().toISOString().slice(0,10);
 
-        document.getElementById('codeOut').value = lines.join('\n');
-        document.getElementById('codeOutWrap').style.display = 'block';
-        document.getElementById('codeOutWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+function setSport(sport) {
+    currentSport = sport;
+    document.querySelectorAll('.sport-row button').forEach(b =>
+        b.classList.toggle('active', b.dataset.sport === sport));
+    updatePreview();
+}
+
+function wrapSelection(before, after) {
+    const ta = document.getElementById('fBody');
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    const val = ta.value;
+    const selected = val.slice(start, end) || 'text';
+    ta.value = val.slice(0, start) + before + selected + after + val.slice(end);
+    ta.focus();
+    ta.selectionStart = start + before.length;
+    ta.selectionEnd = start + before.length + selected.length;
+    updatePreview();
+}
+
+function insertBullet() {
+    const ta = document.getElementById('fBody');
+    const start = ta.selectionStart;
+    const val = ta.value;
+    const needsNewline = start > 0 && val[start-1] !== '\n';
+    const insert = (needsNewline ? '\n' : '') + '- ';
+    ta.value = val.slice(0, start) + insert + val.slice(start);
+    ta.focus();
+    ta.selectionStart = ta.selectionEnd = start + insert.length;
+    updatePreview();
+}
+
+function insertLink() {
+    const url = prompt('Link URL (e.g. https://www.athletic.net/team/7900/cross-country/2026):');
+    if (!url) return;
+    const text = prompt('Link text (what the reader sees):', 'results') || 'link';
+    const ta = document.getElementById('fBody');
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    ta.value = ta.value.slice(0, start) + `[${text}](${url})` + ta.value.slice(end);
+    ta.focus();
+    updatePreview();
+}
+
+function addImageRow(value) {
+    const wrap = document.getElementById('imageRows');
+    const row = document.createElement('div');
+    row.className = 'imgrow';
+    row.innerHTML = `<input type="text" class="imgInput" placeholder="news-images/filename.jpg" oninput="updatePreview()">
+                     <button type="button" onclick="this.parentElement.remove(); updatePreview();">✕</button>`;
+    wrap.appendChild(row);
+    if (value) row.querySelector('input').value = value;
+}
+
+function getImages() {
+    return [...document.querySelectorAll('.imgInput')].map(i => i.value.trim()).filter(Boolean);
+}
+
+function updatePreview() {
+    const title = document.getElementById('fTitle').value.trim();
+    const dateStr = document.getElementById('fDate').value;
+    const body = document.getElementById('fBody').value;
+    const images = getImages();
+    const preview = document.getElementById('previewArea');
+
+    if (!title && !body) {
+        preview.innerHTML = '<p class="preview-empty">Start typing to see a preview…</p>';
+        return;
     }
 
-    function copyCode() {
-        const el = document.getElementById('codeOut');
-        el.select();
-        navigator.clipboard.writeText(el.value).then(() => {
-            const btn = document.getElementById('copyBtn');
-            const orig = btn.textContent;
-            btn.textContent = '✓ Copied!';
-            setTimeout(() => btn.textContent = orig, 1500);
-        }).catch(() => {
-            document.execCommand('copy');
-        });
-    }
+    const badgeClass = currentSport === 'track' ? 'track' : 'xc';
+    const badgeLabel = currentSport === 'track' ? 'Track' : 'XC';
+    const dateLabel = dateStr
+        ? new Date(dateStr + 'T12:00:00').toLocaleDateString('en-US', { weekday:'long', month:'long', day:'numeric', year:'numeric' })
+        : '';
+    const imagesHtml = images.map(src =>
+        `<img class="news-article-img" src="${src}" alt="" onerror="this.style.display='none'">`).join('');
 
-    addImageRow();
+    preview.innerHTML = `
+        <span class="news-badge ${badgeClass}">${badgeLabel}</span>
+        <div class="news-article-title">${title || '(untitled)'}</div>
+        <div class="news-article-date">${dateLabel}</div>
+        ${imagesHtml}
+        <div class="news-article-body">${renderNewsBody(body)}</div>
+    `;
+}
+
+function slugify(str) {
+    return str.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '').slice(0, 60);
+}
+
+function buildPostObject() {
+    const title = document.getElementById('fTitle').value.trim();
+    const dateStr = document.getElementById('fDate').value;
+    const body = document.getElementById('fBody').value;
+    const images = getImages();
+    if (!title || !dateStr) return null;
+    return { id: `${dateStr}-${slugify(title)}`, sport: currentSport, date: dateStr, title, body, images };
+}
+
+function formatPostCode(obj) {
+    const lines = [];
+    lines.push('    {');
+    lines.push(`        id: ${JSON.stringify(obj.id)},`);
+    lines.push(`        sport: ${JSON.stringify(obj.sport)},`);
+    lines.push(`        date: ${JSON.stringify(obj.date)},`);
+    lines.push(`        title: ${JSON.stringify(obj.title)},`);
+    lines.push(`        body: ${JSON.stringify(obj.body)},`);
+    lines.push(`        images: ${JSON.stringify(obj.images)}`);
+    lines.push('    },');
+    return lines.join('\n');
+}
+
+function generateCode() {
+    const obj = buildPostObject();
+    if (!obj) { alert('Add at least a title and date first.'); return; }
+
+    document.getElementById('codeOut').value = formatPostCode(obj);
+    document.getElementById('outputWrap').style.display = 'block';
+    document.getElementById('outputWrap').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+}
+
+function copyCode() {
+    const el = document.getElementById('codeOut');
+    el.select();
+    navigator.clipboard.writeText(el.value).then(() => {
+        const btn = document.getElementById('copyBtn');
+        const orig = btn.textContent;
+        btn.textContent = '✓ Copied!';
+        setTimeout(() => btn.textContent = orig, 1500);
+    }).catch(() => { document.execCommand('copy'); });
+}
+
+// The starter template for news-posts.js (what the file looks like when empty)
+const NEWS_POSTS_TEMPLATE = `// news-posts.js
+// This is YOUR file — add a new post here after every meet and it shows up
+// on the News & Updates page. Newest or oldest doesn't matter, the app
+// sorts by date automatically.
+//
+// Easiest way to add a post: open news-composer.html, fill out the form,
+// click "Download news-posts.js", and replace this file in your GitHub repo.
+//
+// Formatting in the body field:
+//   **bold**
+//   *italic*
+//   ***bold and italic***
+//   [link text](https://example.com)
+//   lines starting with "- " become bullet points
+//   blank line = new paragraph
+
+const NEWS_POSTS = [
+    // Your posts go here — newest first is a good habit, but any order works.
+];
+`;
+
+function downloadUpdatedFile() {
+    const obj = buildPostObject();
+    if (!obj) { alert('Add at least a title and date first.'); return; }
+
+    // Build the file: inject the new post at the top of the array
+    const postCode = formatPostCode(obj);
+    const fileContent = NEWS_POSTS_TEMPLATE.replace(
+        '    // Your posts go here — newest first is a good habit, but any order works.',
+        '    // Your posts go here — newest first is a good habit, but any order works.\n' + postCode
+    );
+
+    const blob = new Blob([fileContent], { type: 'text/javascript' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'news-posts.js';
+    a.click();
+    URL.revokeObjectURL(url);
+}
+
+addImageRow();
 </script>
 </body>
 </html>
